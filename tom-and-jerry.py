@@ -35,6 +35,10 @@ class Jerry:
         self.delta_x = 2
         self.delta_y = 0
 
+    def set_speed(self,deltaX, deltaY):
+        self.delta_x = deltaX
+        self.delta_y = deltaY
+
     # 1 loop, call 1 time
     def run(self):
         self.x += self.delta_x
@@ -43,11 +47,10 @@ class Jerry:
 
         sw, sh = Jerry.shape[self.shapeIndex].get_rect().size
         w, h = pygame.display.get_surface().get_size()
-        if self.x + sw > w: self.delta_x = -2
-        elif self.x < 0: self.delta_x = 2
+        if self.x + sw > w or self.x < 0: self.delta_x = - self.delta_x
 
-        if self.y + sh > h: self.delta_y = 0
-        elif self.y < 0: self.delta_y = 0
+        if self.y + sh > h or self.y < 0: self.delta_y = -self.delta_y
+        # elif self.y < 0: self.delta_y = 0
 
         if self.runCount > 0:
             self.runCount-=1
@@ -79,11 +82,13 @@ pygame.display.set_caption('Tom And Jerry')
 # Init Jerry object
 jerry1 = Jerry(gameDisplay,0,0)
 jerry1.set_animation_speed(FPS,10)
+jerry1.set_speed(3,0)
 
 
 # Init Jerry object
 jerry2 = Jerry(gameDisplay,200,200)
 jerry2.set_animation_speed(FPS,10)
+jerry2.set_speed(4,0)
 
 
 jerry3 = Jerry(gameDisplay,0,200)
@@ -92,10 +97,12 @@ jerry3.set_animation_speed(FPS,10)
 
 jerry4 = Jerry(gameDisplay,0,400)
 jerry4.set_animation_speed(FPS,20)
+jerry4.set_speed(1,0)
 
 
 jerry5 = Jerry(gameDisplay,10,300)
 jerry5.set_animation_speed(FPS,30)
+jerry5.set_speed(6,2)
 
 # This is used for defining fps for game.
 # Ex: clock.tick(60) indicates that this game has fps is 60
