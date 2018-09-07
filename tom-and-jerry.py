@@ -85,8 +85,20 @@ jerry1.set_animation_speed(FPS,10)
 jerry2 = Jerry(gameDisplay,200,200)
 jerry2.set_animation_speed(FPS,10)
 
-# This is used for defined fps for game.
-# Ex: clock.tick(60) indicate that this game has fps is 60
+
+jerry3 = Jerry(gameDisplay,0,200)
+jerry3.set_animation_speed(FPS,10)
+
+
+jerry4 = Jerry(gameDisplay,0,400)
+jerry4.set_animation_speed(FPS,20)
+
+
+jerry5 = Jerry(gameDisplay,10,300)
+jerry5.set_animation_speed(FPS,30)
+
+# This is used for defining fps for game.
+# Ex: clock.tick(60) indicates that this game has fps is 60
 clock = pygame.time.Clock()
 
 finishedGame = False
@@ -101,6 +113,12 @@ while not finishedGame:
 
     jerry1.run()
     jerry2.run()
+    
+    jerry5.run()
+    
+    jerry4.run()
+    
+    jerry3.run()
     pygame.display.flip()
 
     # This will block execution until 1/60 seconds have passed 
