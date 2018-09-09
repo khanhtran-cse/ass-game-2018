@@ -199,7 +199,6 @@ def removeDestroyTank(tanks):
     i = 0
     while i < len(tanks):
         if tanks[i].isDestroy():
-            print('Destroy a tank')
             del tanks[i]
             i -= 1
         i += 1
@@ -220,7 +219,7 @@ pygame.init()
 gameDisplay = pygame.display.set_mode(WINDOW_SIZE)
 
 # Set caption for the window
-pygame.display.set_caption('Tom And Jerry')
+pygame.display.set_caption('Super Tank')
 
 # Load background
 background = pygame.image.load('./images/background.png')
