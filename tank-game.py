@@ -17,6 +17,16 @@ class OtherTank:
     shape = [
             pygame.image.load('./images/tank-move-right.png'),
         ]
+    fire = (
+        pygame.image.load('./images/tank-fire-0.png'),
+        pygame.image.load('./images/tank-fire-1.png'),
+        pygame.image.load('./images/tank-fire-2.png'),
+        pygame.image.load('./images/tank-fire-3.png'),
+        pygame.image.load('./images/tank-fire-4.png'),
+    )
+
+    shapeWidth,shapeHeight = shape[0].get_rect().size
+    fireWidth,fireHeight = fire[0].get_rect().size
     
     # After the ``run`` function was called ``default_amination_speed`` times
     # the image source will be changed
@@ -30,6 +40,10 @@ class OtherTank:
         self.deltaY = 0
         self.isBug = False
         self.isCompleteMission = False
+        self.isFailureMission = False
+        self.fireShapeIndex = 0
+        self.frameCount = 1
+        self.animation_speed = OtherTank.default_amination_speed
 
     # Set speed for object
     def set_speed(self,deltaX, deltaY):
@@ -39,8 +53,8 @@ class OtherTank:
     # 1 loop, call 1 time
     def draw(self):
         if self.isBug: 
-            self.drawBug()
-        if self.isCompleteMission:
+            self.drawFire()
+        if self.isCompleteMission or self.isFailureMission:
             return
 
         self.x += self.deltaX
@@ -51,16 +65,47 @@ class OtherTank:
         sw, sh = OtherTank.shape[0].get_rect().size
         w, h = pygame.display.get_surface().get_size()
         if self.x + sw > w - 50:
-            self.isBug = True
-            self.isCompleteMission = True
+            self.finishMission()
 
-    def drawBug(self):
-        print('Bugging')
-        self.isBug = False
-        self.finishMission()
+    def drawFire(self):
+        if self.fireShapeIndex < 5:
+            x = self.x + OtherTank.shapeWidth/2 - OtherTank.fireWidth/2
+            y = self.y + OtherTank.shapeHeight/2 - OtherTank.fireHeight/2
+            if self.frameCount < self.animation_speed:
+                self.frameCount += 1
+                self.gameDisplay.blit(OtherTank.fire[self.fireShapeIndex],(x,y))
+            else:
+                self.gameDisplay.blit(OtherTank.fire[self.fireShapeIndex],(x,y))
+                self.fireShapeIndex += 1
+                self.frameCount = 1
+        else:
+            self.isBug = False
     
     def finishMission(self):
-        print('Complete Mission')
+        self.isBug = True
+        self.isCompleteMission = True
+        pygame.mixer.Sound('./sounds/failure.wav').play()
+
+    def failureMission(self):
+        self.isFailureMission = True
+        self.isBug = True
+        pygame.mixer.Sound('./sounds/fire.wav').play()
+
+    def otherShotAt(self,position):
+        if not self.isCompleteMission and not self.isFailureMission:
+            x = position[0]
+            y = position[1]
+            if x > self.x and x < self.x + OtherTank.shapeWidth \
+            and y > self.y and y < self.y + OtherTank.shapeHeight:
+                self.failureMission()
+
+    def isDestroy(self):
+        if self.isBug:
+            return False
+        return self.isCompleteMission or self.isFailureMission
+    
+    def getMissionResult(self):
+        return self.isCompleteMission
         
 
 
@@ -143,7 +188,30 @@ class MyTank:
             self.gameDisplay.blit(MyTank.shotIcon,(cursorX,cursorY))
         else:
             self.gameDisplay.blit(MyTank.notReadyIcon,(cursorX,cursorY))
+    def isReadyToShot(self):
+        return self.isMovedToMouse
 
+def shotAt(tanks,position):
+    for tank in tanks:
+        tank.otherShotAt(position)
+
+def removeDestroyTank(tanks):
+    i = 0
+    while i < len(tanks):
+        if tanks[i].isDestroy():
+            print('Destroy a tank')
+            del tanks[i]
+            i -= 1
+        i += 1
+
+def createNewTank(tanks, gameDisplay):
+    if len(tanks) < 5:
+        y = random.randint(50,DISPLAY_HEIGHT-50)
+        tank = OtherTank(gameDisplay,0,y)
+        tank.set_animation_speed(FPS,30)
+        tank.set_speed(random.randint(1,5),0)
+
+        tanks.append(tank)
 
 # Initilize python
 pygame.init()
@@ -160,34 +228,24 @@ background = pygame.image.load('./images/background.png')
 # Hide cursor
 pygame.mouse.set_visible(False)
 
-# Init Jerry object
-jerry1 = OtherTank(gameDisplay,0,0)
-jerry1.set_animation_speed(FPS,10)
-jerry1.set_speed(3,0)
-
+# Play background sound
+pygame.mixer.Sound('./sounds/background.wav').play(-1)
 
 # Init Jerry object
-jerry2 = OtherTank(gameDisplay,200,200)
-jerry2.set_animation_speed(FPS,10)
-jerry2.set_speed(4,2)
-
-
-jerry3 = OtherTank(gameDisplay,0,200)
-jerry3.set_animation_speed(FPS,10)
-
-
-jerry4 = OtherTank(gameDisplay,0,400)
-jerry4.set_animation_speed(FPS,20)
-jerry4.set_speed(1,1)
-
-
-jerry5 = OtherTank(gameDisplay,10,300)
-jerry5.set_animation_speed(FPS,30)
-jerry5.set_speed(6,2)
+tanks = [
+    OtherTank(gameDisplay,0,0),
+    OtherTank(gameDisplay,200,200),
+    OtherTank(gameDisplay,0,200),
+    OtherTank(gameDisplay,0,400),
+    OtherTank(gameDisplay,10,300)
+]
+for tank in tanks:
+    tank.set_animation_speed(FPS,30)
+    tank.set_speed(3,0)
 
 # Init my tank
 myTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0)
-myTank.set_speed(4,4)
+myTank.set_speed(4,8)
 
 # This is used for defining fps for game.
 # Ex: clock.tick(60) indicates that this game has fps is 60
@@ -199,18 +257,18 @@ while not finishedGame:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finishedGame = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if myTank.isReadyToShot():
+                shotAt(tanks,pygame.mouse.get_pos())
+
+    removeDestroyTank(tanks)
+    createNewTank(tanks,gameDisplay)
 
     gameDisplay.blit(background,(0,0))
     # pygame.draw.rect(gameDisplay,BLACK,pygame.Rect(0,300,DISPLAY_WIDTH,305))
 
-    jerry1.draw()
-    jerry2.draw()
-    
-    jerry5.draw()
-    
-    jerry4.draw()
-    
-    jerry3.draw()
+    for tank in tanks:
+        tank.draw()
 
     myTank.draw(pygame.mouse.get_pos())
     pygame.display.flip()
