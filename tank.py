@@ -2,13 +2,6 @@ import pygame
 import random
 import time
 
-# Define the fps
-FPS = 60
-
-
-# Define the size of the window
-WINDOW_SIZE = DISPLAY_WIDTH, DISPLAY_HEIGHT = 1050, 700
-
 class OtherTank:
     # Image for rendering Tank
     shape = [
@@ -48,6 +41,7 @@ class OtherTank:
         self.deltaY = deltaY
 
     # 1 loop, call 1 time
+    # Draw the tank
     def draw(self):
         if self.isBug: 
             self.drawFire()
@@ -64,6 +58,8 @@ class OtherTank:
         if self.x + sw > w - 50:
             self.finishMission()
 
+    # Fire, it means the tank was destroyed
+    # This function will draw destroyed animation
     def drawFire(self):
         if self.fireShapeIndex < 5:
             x = self.x + OtherTank.shapeWidth/2 - OtherTank.fireWidth/2
@@ -88,6 +84,7 @@ class OtherTank:
         self.isBug = True
         pygame.mixer.Sound('./sounds/fire.wav').play()
 
+    # Determines that the tank is shoted or not
     def otherShotAt(self,position):
         if not self.isCompleteMission and not self.isFailureMission:
             x = position[0]
@@ -103,6 +100,8 @@ class OtherTank:
             return False
         return self.isCompleteMission or self.isFailureMission
     
+    # Get the mission result of the tank
+    # If the tank completed missions, this function will return True, otherwise False
     def getMissionResult(self):
         return self.isCompleteMission
         
@@ -187,5 +186,6 @@ class MyTank:
             self.gameDisplay.blit(MyTank.shotIcon,(cursorX,cursorY))
         else:
             self.gameDisplay.blit(MyTank.notReadyIcon,(cursorX,cursorY))
+
     def isReadyToShot(self):
         return self.isMovedToMouse

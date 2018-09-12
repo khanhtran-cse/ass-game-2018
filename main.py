@@ -5,12 +5,14 @@ import time
 from tank import *
 from score import *
 
+# Define FPS
+FPS = 60
 
 # Define the size of the window
 WINDOW_SIZE = DISPLAY_WIDTH, DISPLAY_HEIGHT = 1050, 700
 
 # Define max miss
-MAX_MISS = 10
+MAX_MISS = 1
 
 #Define some colors
 WHITE = (255,255,255)
@@ -43,8 +45,25 @@ def createNewTank(tanks, maxTank, gameDisplay):
 
 # Invokes when game over
 # Draw game over menu
-def showGameOverMenu(gameDisplay,score):
-    print('Game over')
+def showGameOverMenu(gameDisplay,score,mousePosition):
+    font = pygame.font.SysFont("helvetica", 60)
+    FAILURE_COLOR = (244, 66, 66)
+    gameOverText = font.render('Game Over', True, FAILURE_COLOR)
+    gameDisplay.blit(gameOverText, (420, 300))
+
+    font = pygame.font.SysFont("helvetica", 30)
+    hintText = font.render('Click to play again', True, (0,0,0))
+    gameDisplay.blit(hintText, (450, 350))
+
+    # Draw mouse
+    cursorX = mousePosition[0] -12
+    cursorY = mousePosition[1] - 12
+    if cursorX < 0: 
+        cursorX = 0
+    if cursorY < 0:
+        cursorY = 0
+    gameDisplay.blit(GAME_OVER_MOUSE,(cursorX,cursorY))
+
 
 # Initilize python
 pygame.init()
@@ -64,7 +83,11 @@ pygame.mouse.set_visible(False)
 # Play background sound
 pygame.mixer.Sound('./sounds/background.wav').play(-1)
 
+# Init score
 score = Score(gameDisplay, 15, 10)
+
+#Game over mouse 
+GAME_OVER_MOUSE = pygame.image.load('./images/cursor-shot.png')
 
 # Init Enemy Tank array
 tanks = []
@@ -107,10 +130,15 @@ while not finishedGame:
 
     # Handle game over
     if gameOver:
+        # Draw background to remove old state
+        gameDisplay.blit(background,(0,0))
         # Todo: Draw game over menu
-        showGameOverMenu(gameDisplay,score)
+        showGameOverMenu(gameDisplay,score,pygame.mouse.get_pos())
         # This will block execution until 1/60 seconds have passed 
         # since the previous time clock.tick was called.
+
+        # Update the display
+        pygame.display.flip()
         clock.tick(FPS)
         continue
 
