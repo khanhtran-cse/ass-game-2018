@@ -45,14 +45,8 @@ def createNewTank(tanks, maxTank, gameDisplay):
 
 # Invokes when game over
 # Draw game over menu
-def showGameOverMenu(gameDisplay,score,mousePosition):
-    font = pygame.font.SysFont("helvetica", 60)
-    FAILURE_COLOR = (244, 66, 66)
-    gameOverText = font.render('Game Over', True, FAILURE_COLOR)
-    gameDisplay.blit(gameOverText, (420, 300))
-
-    font = pygame.font.SysFont("helvetica", 30)
-    hintText = font.render('Click to play again', True, (0,0,0))
+def showGameOverMenu(gameDisplay,score,mousePosition,gameOverText,hintText):
+    gameDisplay.blit(gameOverText, (445, 300))
     gameDisplay.blit(hintText, (450, 350))
 
     # Draw mouse
@@ -106,6 +100,12 @@ finishedGame = False
 # To restart game, set this to True
 restartGame = False
 
+# Test menu
+gameOverFont = pygame.font.SysFont("helvetica", 60)
+hintFont = pygame.font.SysFont("helvetica", 30)
+gameOverText = gameOverFont.render('Game Over', True, (244, 66, 66))
+hintText = hintFont.render('Click here to play again', True, (0,0,0))
+
 while not finishedGame:
     # Handle event
     for event in pygame.event.get():
@@ -113,7 +113,9 @@ while not finishedGame:
             finishedGame = True
         elif event.type == pygame.MOUSEBUTTONUP:
             if gameOver:
-                restartGame = True
+                x,y = pygame.mouse.get_pos()
+                if x > 400 and x < 700 and y > 345 and y < 375:
+                    restartGame = True
             else:
                 if myTank.isReadyToShot():
                     shotAt(tanks,pygame.mouse.get_pos())
@@ -133,12 +135,12 @@ while not finishedGame:
         # Draw background to remove old state
         gameDisplay.blit(background,(0,0))
         # Todo: Draw game over menu
-        showGameOverMenu(gameDisplay,score,pygame.mouse.get_pos())
-        # This will block execution until 1/60 seconds have passed 
-        # since the previous time clock.tick was called.
+        showGameOverMenu(gameDisplay,score,pygame.mouse.get_pos(),gameOverText,hintText)
 
         # Update the display
         pygame.display.flip()
+        # This will block execution until 1/60 seconds have passed 
+        # since the previous time clock.tick was called.
         clock.tick(FPS)
         continue
 

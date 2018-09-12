@@ -7,7 +7,6 @@ class Score:
 	score = 0
 	miss = 0
 
-
 	def __init__(self, gameDisplay, x,y):
 		self.gameDisplay = gameDisplay
 		self.x = x
@@ -35,7 +34,6 @@ class Score:
 	def draw(self):
 		textScore = self.font.render(self.titleScore + str(self.score), True, Score.SCORE_COLOR)
 		textMiss = self.font.render(self.titleMiss + str(self.miss), True, Score.FAILURE_COLOR)
-		#pygame.draw.rect(self.gameDisplay, Score.BACKGROUND_COLOR, pygame.Rect(self.x-10,self.y-5,self.x + 120, self.y + 40))
 		self.gameDisplay.blit(Score.BACKGROUND,(self.x - 10, self.y - 5))
 		self.gameDisplay.blit(textScore, (self.x, self.y ))
 		self.gameDisplay.blit(textMiss, (self.x, self.y+ 20))
