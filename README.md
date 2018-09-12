@@ -5,6 +5,6 @@ puzzle game, zombie
 run:
 
 ```
-python main.py
+python run.py
 ```
 
