@@ -45,7 +45,7 @@ def createNewTank(tanks, maxTank, gameDisplay):
 
 # Invokes when game over
 # Draw game over menu
-def showGameOverMenu(gameDisplay,score,mousePosition,gameOverText,hintText):
+def showGameOverMenu(gameDisplay,score,mousePosition,gameOverText,hintText, GAME_OVER_MOUSE):
     gameDisplay.blit(gameOverText, (445, 300))
     gameDisplay.blit(hintText, (450, 350))
 
@@ -59,118 +59,110 @@ def showGameOverMenu(gameDisplay,score,mousePosition,gameOverText,hintText):
     gameDisplay.blit(GAME_OVER_MOUSE,(cursorX,cursorY))
 
 
-# Initilize python
-pygame.init()
+def startTank(gameDisplay):
+    # Set caption for the window
+    pygame.display.set_caption('Super Tank')
 
-# Set the size for the window
-gameDisplay = pygame.display.set_mode(WINDOW_SIZE)
+    # Load background
+    background = pygame.image.load('./images/background.png')
 
-# Set caption for the window
-pygame.display.set_caption('Tom And Jerry')
+    # Hide cursor
+    pygame.mouse.set_visible(False)
 
-# Load background
-background = pygame.image.load('./images/background.png')
+    # Play background sound
+    pygame.mixer.Sound('./sounds/background.wav').play(-1)
 
-# Hide cursor
-pygame.mouse.set_visible(False)
+    # Init score
+    score = Score(gameDisplay, 15, 10)
 
-# Play background sound
-pygame.mixer.Sound('./sounds/background.wav').play(-1)
+    #Game over mouse 
+    GAME_OVER_MOUSE = pygame.image.load('./images/cursor-shot.png')
 
-# Init score
-score = Score(gameDisplay, 15, 10)
+    # Init Enemy Tank array
+    tanks = []
 
-#Game over mouse 
-GAME_OVER_MOUSE = pygame.image.load('./images/cursor-shot.png')
+    # Init my tank
+    myTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0)
+    myTank.set_speed(4,8)
 
-# Init Enemy Tank array
-tanks = []
+    # This is used for defining fps for game.
+    # Ex: clock.tick(60) indicates that this game has fps is 60
+    clock = pygame.time.Clock()
 
-# Init my tank
-myTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0)
-myTank.set_speed(4,8)
+    gameOver = False
+    finishedGame = False
 
-# This is used for defining fps for game.
-# Ex: clock.tick(60) indicates that this game has fps is 60
-clock = pygame.time.Clock()
+    # To restart game, set this to True
+    restartGame = False
 
-gameOver = False
-finishedGame = False
+    # Test menu
+    gameOverFont = pygame.font.SysFont("helvetica", 60)
+    hintFont = pygame.font.SysFont("helvetica", 30)
+    gameOverText = gameOverFont.render('Game Over', True, (244, 66, 66))
+    hintText = hintFont.render('Click here to play again', True, (0,0,0))
 
-# To restart game, set this to True
-restartGame = False
+    while not finishedGame:
+        # Handle event
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finishedGame = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if gameOver:
+                    x,y = pygame.mouse.get_pos()
+                    if x > 400 and x < 700 and y > 345 and y < 375:
+                        restartGame = True
+                else:
+                    if myTank.isReadyToShot():
+                        shotAt(tanks,pygame.mouse.get_pos())
 
-# Test menu
-gameOverFont = pygame.font.SysFont("helvetica", 60)
-hintFont = pygame.font.SysFont("helvetica", 30)
-gameOverText = gameOverFont.render('Game Over', True, (244, 66, 66))
-hintText = hintFont.render('Click here to play again', True, (0,0,0))
+        # Reset state to start new game
+        if restartGame:
+            tanks = []
+            score.resetScore()
+            gameOver = False
+            restartGame = False
 
-while not finishedGame:
-    # Handle event
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            finishedGame = True
-        elif event.type == pygame.MOUSEBUTTONUP:
-            if gameOver:
-                x,y = pygame.mouse.get_pos()
-                if x > 400 and x < 700 and y > 345 and y < 375:
-                    restartGame = True
-            else:
-                if myTank.isReadyToShot():
-                    shotAt(tanks,pygame.mouse.get_pos())
+        if score.getMiss() >= MAX_MISS:
+            gameOver = True
 
-    # Reset state to start new game
-    if restartGame:
-        tanks = []
-        score.resetScore()
-        gameOver = False
-        restartGame = False
+        # Handle game over
+        if gameOver:
+            # Draw background to remove old state
+            gameDisplay.blit(background,(0,0))
+            # Todo: Draw game over menu
+            showGameOverMenu(gameDisplay,score,pygame.mouse.get_pos(),gameOverText,hintText, GAME_OVER_MOUSE)
 
-    if score.getMiss() >= MAX_MISS:
-        gameOver = True
+            # Update the display
+            pygame.display.flip()
+            # This will block execution until 1/60 seconds have passed 
+            # since the previous time clock.tick was called.
+            clock.tick(FPS)
+            continue
 
-    # Handle game over
-    if gameOver:
+        # Calculate score and remove the tanks was shoted or the tanks was finished mission.
+        calculateScoreAndRemoveDestroyTank(tanks, score)
+
+        # Create new tanks to replace for the destroyed tanks
+        # and inscrease the number of the tanks to increase difficult level
+        maxTank = score.getScore()/10 + 4
+        createNewTank(tanks,maxTank,gameDisplay)
+
         # Draw background to remove old state
         gameDisplay.blit(background,(0,0))
-        # Todo: Draw game over menu
-        showGameOverMenu(gameDisplay,score,pygame.mouse.get_pos(),gameOverText,hintText)
+
+        # Draw score
+        score.draw()
+
+        # Draw enemy tanks
+        for tank in tanks:
+            tank.draw()
+
+        # Draw my tank
+        myTank.draw(pygame.mouse.get_pos())
 
         # Update the display
         pygame.display.flip()
+
         # This will block execution until 1/60 seconds have passed 
         # since the previous time clock.tick was called.
         clock.tick(FPS)
-        continue
-
-    # Calculate score and remove the tanks was shoted or the tanks was finished mission.
-    calculateScoreAndRemoveDestroyTank(tanks, score)
-
-    # Create new tanks to replace for the destroyed tanks
-    # and inscrease the number of the tanks to increase difficult level
-    maxTank = score.getScore()/10 + 4
-    createNewTank(tanks,maxTank,gameDisplay)
-
-    # Draw background to remove old state
-    gameDisplay.blit(background,(0,0))
-
-    # Draw score
-    score.draw()
-
-    # Draw enemy tanks
-    for tank in tanks:
-        tank.draw()
-
-    # Draw my tank
-    myTank.draw(pygame.mouse.get_pos())
-
-    # Update the display
-    pygame.display.flip()
-
-    # This will block execution until 1/60 seconds have passed 
-    # since the previous time clock.tick was called.
-    clock.tick(FPS)
-
-pygame.quit()
-quit()
