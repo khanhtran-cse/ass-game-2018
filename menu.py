@@ -26,7 +26,7 @@ class Menu:
 		self.gameDisplay.blit(textExit, (self.x + 15, self.y + 50 ))
 
 	def checkPos(self, x, y):
-		print(self.backgroundPlay);
+		print(self.backgroundPlay)
 		print(self.backgroundExit)
 		if self.backgroundPlay[0] < x < self.backgroundPlay[1] and self.backgroundPlay[2]< y <self.backgroundPlay[3]:
 			return 'play'
@@ -53,7 +53,7 @@ def startMenu():
 				res = menu.checkPos(posX, posY)
 				exit = (0,1)[res == 'exit']
 				if res == 'play':
-					startTank(gameDisplay)
+					exit = not startTank(gameDisplay)
 					pass
 
 				# print(res, posX, posY, exit)
