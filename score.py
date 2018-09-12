@@ -28,6 +28,10 @@ class Score:
 	def getMiss(self):
 		return self.miss
 
+	def resetScore(self):
+		self.miss = 0
+		self.score = 0
+
 	def draw(self):
 		textScore = self.font.render(self.titleScore + str(self.score), True, Score.SCORE_COLOR)
 		textMiss = self.font.render(self.titleMiss + str(self.miss), True, Score.FAILURE_COLOR)
