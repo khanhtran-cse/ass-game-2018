@@ -59,7 +59,7 @@ pygame.mouse.set_visible(False)
 # Play background sound
 pygame.mixer.Sound('./sounds/background.wav').play(-1)
 
-score = Score(gameDisplay, 5, 5)
+score = Score(gameDisplay, 15, 10)
 
 # Init Jerry object
 tanks = [
