@@ -45,8 +45,10 @@ def createNewTank(tanks, maxTank, gameDisplay):
 
 # Invokes when game over
 # Draw game over menu
-def showGameOverMenu(gameDisplay,score,mousePosition,gameOverText,hintText, GAME_OVER_MOUSE):
-    gameDisplay.blit(gameOverText, (445, 300))
+def showGameOverMenu(gameDisplay,score,mousePosition,gameOverText,hintText, hintFont, GAME_OVER_MOUSE):
+    # gameDisplay.blit(gameOverText, (445, 300))
+    score = hintFont.render('Your Score: ' + str(score.getScore()), True, (244, 66, 66))
+    gameDisplay.blit(score, (440, 300))
     gameDisplay.blit(hintText, (450, 350))
 
     # Draw mouse
@@ -99,18 +101,18 @@ def startTank(gameDisplay):
     gameOverFont = pygame.font.SysFont("helvetica", 60)
     hintFont = pygame.font.SysFont("helvetica", 30)
     gameOverText = gameOverFont.render('Game Over', True, (244, 66, 66))
-    hintText = hintFont.render('Click here to play again', True, (0,0,0))
+    hintText = hintFont.render('Click here to continue', True, (0,0,0))
 
     while not finishedGame:
         # Handle event
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                finishedGame = True
+                return False
             elif event.type == pygame.MOUSEBUTTONUP:
                 if gameOver:
                     x,y = pygame.mouse.get_pos()
                     if x > 400 and x < 700 and y > 345 and y < 375:
-                        restartGame = True
+                        return True
                 else:
                     if myTank.isReadyToShot():
                         shotAt(tanks,pygame.mouse.get_pos())
@@ -130,7 +132,7 @@ def startTank(gameDisplay):
             # Draw background to remove old state
             gameDisplay.blit(background,(0,0))
             # Todo: Draw game over menu
-            showGameOverMenu(gameDisplay,score,pygame.mouse.get_pos(),gameOverText,hintText, GAME_OVER_MOUSE)
+            showGameOverMenu(gameDisplay,score,pygame.mouse.get_pos(),gameOverText,hintText, gameOverFont, GAME_OVER_MOUSE)
 
             # Update the display
             pygame.display.flip()

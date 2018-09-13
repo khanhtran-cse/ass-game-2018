@@ -64,7 +64,7 @@ def startMenu():
 				res = menu.checkPos(posX, posY)
 				exit = (0,1)[res == 'exit']
 				if res == 'play':
-					startTank(gameDisplay)
+					exit = not startTank(gameDisplay)
 					pass
 
 		
