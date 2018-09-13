@@ -12,7 +12,7 @@ FPS = 60
 WINDOW_SIZE = DISPLAY_WIDTH, DISPLAY_HEIGHT = 1050, 700
 
 # Define max miss
-MAX_MISS = 1
+MAX_MISS = 10
 
 #Define some colors
 WHITE = (255,255,255)

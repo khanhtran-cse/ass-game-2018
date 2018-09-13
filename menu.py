@@ -7,6 +7,7 @@ class Menu:
 	TEXTCOLOR = (29, 155, 1)
 	MENUIMAGE = pygame.image.load('./images/menu.jpg')
 	MENUIMAGE = pygame.transform.scale(MENUIMAGE, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+	MOUSEIMAGE = pygame.image.load('./images/cursor-shot.png')
 
 	tron_yel = (255, 202, 0) 
 	tron_regular = (255,   0,   0)
@@ -55,6 +56,9 @@ def startMenu():
 	pygame.display.set_caption('Menu')
 	menu.draw()
 
+	# Hide cursor
+	pygame.mouse.set_visible(False)
+
 	while not exit: 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -70,9 +74,19 @@ def startMenu():
 		
 		gameDisplay.blit(Menu.MENUIMAGE, (0,0))
 		menu.draw()
+		
+		#Draw custom cursor
+		x,y = pygame.mouse.get_pos()
+		if x >= 12:
+			x -= 12
+		else:
+			x = 0
+		if y >= 12:
+			y -= 12
+		else:
+			y=0
+		gameDisplay.blit(Menu.MOUSEIMAGE,(x,y))
 
-	    # Hide cursor
-		pygame.mouse.set_visible(True)
 		pygame.display.flip()
 
 	pygame.quit()
