@@ -84,7 +84,7 @@ def startTank(gameDisplay):
 
     # Initial my tank
     myTank = MyTank(gameDisplay,0,0,id_tank=1,id_group=1)
-    myTank1 = MyTank(gameDisplay, 0, 200, id_tank=2, id_group=1)
+    myTank1 = MyTank(gameDisplay, 0,0, id_tank=2, id_group=1)
     myTank_List = []
 
     #Initial enemy tanks

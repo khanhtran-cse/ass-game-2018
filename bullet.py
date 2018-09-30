@@ -26,6 +26,9 @@ class Bullet:
         self.x_start += self.speed
         self.draw(positionBullet)
 
+    def colision(self):
+        pass
+
 
 
 
