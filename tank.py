@@ -26,6 +26,9 @@ class MyTank:
     def draw(self,positionImage):
         self.gamedisplay.blit(positionImage,(self.x,self.y))
 
+    def shoot(self):
+        print("Shoot")
+
     def move(self,event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
@@ -40,6 +43,9 @@ class MyTank:
             elif event.key == pygame.K_RIGHT:
                 print("RIGHT")
                 self.x += 10
+            elif event.key == pygame.K_SPACE:
+                self.shoot()
+
 
     #Cho nay cho con AI quyet dinh
     def Automove(self):

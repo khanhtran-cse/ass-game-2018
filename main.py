@@ -85,10 +85,17 @@ def startTank(gameDisplay):
     # Initial my tank
     myTank = MyTank(gameDisplay,0,0,id_tank=1,id_group=1)
     myTank1 = MyTank(gameDisplay, 0,0, id_tank=2, id_group=1)
-    myTank_List = []
+    myTank2 = MyTank(gameDisplay, 0, 0, id_tank=3, id_group=1)
+    myTank3 = MyTank(gameDisplay, 0, 0, id_tank=4, id_group=1)
+    myTank_List = [myTank, myTank1,myTank2,myTank3]
 
     #Initial enemy tanks
     enemyTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0,id_tank=1,id_group=0)
+    enemyTank1 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=2, id_group=0)
+    enemyTank2 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=3, id_group=0)
+    enemyTank3 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=4, id_group=0)
+    enemyTank_List = [enemyTank,enemyTank1,enemyTank2,enemyTank3]
+
 
     #Initial bullet
     bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=20, x_start=0, y_start=0, x_end=0, y_end=0)
@@ -167,7 +174,7 @@ def startTank(gameDisplay):
         myTank1.draw(myTank1.shape[0])
 
         #Display enemy tank
-        enemyTank.draw(myTank.shape[1])
+        enemyTank_List[0].draw(myTank.shape[1])
 
         bullet.motion(bullet.bullet[1])
 
