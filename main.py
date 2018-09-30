@@ -98,7 +98,7 @@ def startTank(gameDisplay):
 
 
     #Initial bullet
-    bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=20, x_start=0, y_start=0, x_end=0, y_end=0)
+    #bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=20, x_start=0, y_start=0, x_end=0, y_end=0)
 
 
     # This is used for defining fps for game.
@@ -116,6 +116,7 @@ def startTank(gameDisplay):
     hintFont = pygame.font.SysFont("helvetica", 30)
     gameOverText = gameOverFont.render('Game Over', True, (244, 66, 66))
     hintText = hintFont.render('Click here to continue', True, (0,0,0))
+
 
     while not finishedGame:
 
@@ -166,17 +167,17 @@ def startTank(gameDisplay):
         score.draw()
 
         # Draw enemy tanks
-        for tank in tanks:
-            tank.draw()
+        # for tank in tanks:
+        #     tank.draw()
 
         #Display my tank
-        myTank.draw(myTank.shape[0])
-        myTank1.draw(myTank1.shape[0])
+        myTank.draw(myTank.shape[myTank.index_myTank])
+        #myTank1.draw(myTank1.shape[0])
 
         #Display enemy tank
         enemyTank_List[0].draw(myTank.shape[1])
 
-        bullet.motion(bullet.bullet[1])
+        #bullet.motion(bullet.bullet[1])
 
         # Update the display
         pygame.display.flip()

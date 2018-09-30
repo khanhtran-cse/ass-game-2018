@@ -9,8 +9,8 @@ class Bullet:
             pygame.image.load("./images/bullet-down.png")
     ]
 
-    def __init__(self,display,id_tank,id_group,speed,x_start,y_start,x_end,y_end):
-        self.display = display
+    def __init__(self,gameDisplay,id_tank,id_group,speed,x_start,y_start,x_end,y_end):
+        self.gameDisplay = gameDisplay
         self.id = id_tank
         self.id_group = id_group
         self.speed = speed
@@ -20,7 +20,7 @@ class Bullet:
         self.y_end = y_end
 
     def draw(self,positionBullet):
-        self.display.blit(positionBullet,(self.x_start,self.y_start))
+        self.gameDisplay.blit(positionBullet,(self.x_start,self.y_start))
 
     def motion(self,positionBullet):
         self.x_start += self.speed
