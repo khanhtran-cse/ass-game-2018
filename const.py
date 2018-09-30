@@ -1,14 +1,16 @@
 
-
+import pygame
 
 # size of screen
 
-WINDOW_WIDTH = 800 # px
-WINDOW_HEIGHT = 500 # px
+WINDOW_WIDTH = 1300 # px
+WINDOW_HEIGHT = 700 # px
+
+WINDOW_SIZE = (WINDOW_WIDTH, WINDOW_HEIGHT)
 
 METER_PER_PIXAR = 2
 
-FRAME = 30 # fps
+FPS = 30 # fps
 
 # team mate
 
@@ -23,6 +25,11 @@ TANK_SPEED = 2 # m/s
 
 TANK_VIEWRANGE = 50 # m
 
-TANK_TIME_RELOAD = 10 # s
+TANK_TIME_RELOAD = 10000 # ms
 
- 
+# bullet
+
+BULLET_SPEED = 1/300 # m/ms
+
+
+COLOR_BLUE = '#0000FF' 
