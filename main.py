@@ -40,11 +40,6 @@ def calculateScoreAndRemoveDestroyTank(tanks, score):
 def createNewTank(tanks, maxTank, gameDisplay):
     if len(tanks) < maxTank:
         y = random.randint(50,DISPLAY_HEIGHT-50)
-        tank = OtherTank(gameDisplay,0,y)
-        tank.set_animation_speed(FPS,30)
-        tank.set_speed(random.randint(1,5),0)
-
-        tanks.append(tank)
 
 # Invokes when game over
 # Draw game over menu
@@ -87,9 +82,16 @@ def startTank(gameDisplay):
     # Init Enemy Tank array
     tanks = []
 
-    # Init my tank
+    # Initial my tank
     myTank = MyTank(gameDisplay,0,0,id_tank=1,id_group=1)
-    bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=1, x_start=0, y_start=0, x_end=0, y_end=0)
+    myTank1 = MyTank(gameDisplay, 0, 200, id_tank=2, id_group=1)
+    myTank_List = []
+
+    #Initial enemy tanks
+    enemyTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0,id_tank=1,id_group=0)
+
+    #Initial bullet
+    bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=20, x_start=0, y_start=0, x_end=0, y_end=0)
 
 
     # This is used for defining fps for game.
@@ -115,6 +117,7 @@ def startTank(gameDisplay):
             if event.type == pygame.QUIT:
                 return False
             myTank.move(event)
+
 
 
         # Reset state to start new game
@@ -159,8 +162,14 @@ def startTank(gameDisplay):
         for tank in tanks:
             tank.draw()
 
+        #Display my tank
         myTank.draw(myTank.shape[0])
-        #bullet.draw(bullet.bullet[0])
+        myTank1.draw(myTank1.shape[0])
+
+        #Display enemy tank
+        enemyTank.draw(myTank.shape[1])
+
+        bullet.motion(bullet.bullet[1])
 
         # Update the display
         pygame.display.flip()

@@ -21,7 +21,10 @@ class Bullet:
 
     def draw(self,positionBullet):
         self.display.blit(positionBullet,(self.x_start,self.y_start))
-    
+
+    def motion(self,positionBullet):
+        self.x_start += self.speed
+        self.draw(positionBullet)
 
 
 
