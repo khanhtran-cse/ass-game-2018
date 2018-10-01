@@ -82,23 +82,25 @@ def startTank(gameDisplay):
     # Init Enemy Tank array
     tanks = []
 
+
+
     # Initial my tank
-    myTank = MyTank(gameDisplay,0,0,id_tank=1,id_group=1)
-    myTank1 = MyTank(gameDisplay, 0,0, id_tank=2, id_group=1)
-    myTank2 = MyTank(gameDisplay, 0, 0, id_tank=3, id_group=1)
-    myTank3 = MyTank(gameDisplay, 0, 0, id_tank=4, id_group=1)
-    myTank_List = [myTank, myTank1,myTank2,myTank3]
+    myTank = MyTank(gameDisplay,0,400,id_tank=1,id_group=1,speed_x=0,speed_y=0)
+    # myTank1 = MyTank(gameDisplay, 0,0, id_tank=2, id_group=1)
+    # myTank2 = MyTank(gameDisplay, 0, 0, id_tank=3, id_group=1)
+    # myTank3 = MyTank(gameDisplay, 0, 0, id_tank=4, id_group=1)
+    # myTank_List = [myTank, myTank1,myTank2,myTank3]
 
     #Initial enemy tanks
-    enemyTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0,id_tank=1,id_group=0)
-    enemyTank1 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=2, id_group=0)
-    enemyTank2 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=3, id_group=0)
-    enemyTank3 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=4, id_group=0)
+    enemyTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0,id_tank=1,id_group=0,speed_x=0,speed_y=0)
+    enemyTank1 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=2, id_group=0,speed_x=0,speed_y=0)
+    enemyTank2 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=3, id_group=0,speed_x=0,speed_y=0)
+    enemyTank3 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=4, id_group=0,speed_x=0,speed_y=0)
     enemyTank_List = [enemyTank,enemyTank1,enemyTank2,enemyTank3]
 
 
-    #Initial bullet
-    #bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=20, x_start=0, y_start=0, x_end=0, y_end=0)
+    # Initial bullet
+    bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=0, x_start=myTank.x, y_start=myTank.y, x_end=0, y_end=0)
 
 
     # This is used for defining fps for game.
@@ -117,6 +119,9 @@ def startTank(gameDisplay):
     gameOverText = gameOverFont.render('Game Over', True, (244, 66, 66))
     hintText = hintFont.render('Click here to continue', True, (0,0,0))
 
+    speed_bullet = 0
+    speed_tank_x  = 0
+    speed_tank_y = 0
 
     while not finishedGame:
 
@@ -124,9 +129,17 @@ def startTank(gameDisplay):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
-            myTank.move(event)
 
+            speed_tank_x = myTank.move(event)[0]
+            speed_tank_y = myTank.move(event)[1]
 
+            # bullet
+            speed_bullet = bullet.motion(event,bullet.bullet[0])
+
+        bullet.x_start += speed_bullet
+
+        myTank.x += speed_tank_x
+        myTank.y += speed_tank_y
 
         # Reset state to start new game
         if restartGame:
@@ -175,9 +188,9 @@ def startTank(gameDisplay):
         #myTank1.draw(myTank1.shape[0])
 
         #Display enemy tank
-        enemyTank_List[0].draw(myTank.shape[1])
+        enemyTank_List[0].draw(myTank.shape[0])
 
-        #bullet.motion(bullet.bullet[1])
+        bullet.draw(bullet.bullet[0])
 
         # Update the display
         pygame.display.flip()
