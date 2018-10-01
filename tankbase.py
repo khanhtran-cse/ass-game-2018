@@ -3,25 +3,23 @@ from const import *
 
 class BaseTank(pygame.sprite.Sprite):
 
-	blood = TANK_BLOOD
 	speed = TANK_SPEED
-	isDead = False
+	isDestroy = False
 	isVisible = False
+	size_image = (50,30)
 
 	def __init__(self, pos):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.Surface([30,50])
+
+		self.image = pygame.Surface(self.size_image)
 		self.image.fill(COLOR_BLUE)
-		self.rect = self.image.get_rect()
+		self.rect = (pos, self.size_image)
 
 		self.pos = pos
+		self.hp = TANK_HP
 
-
-	def updateBlood(self, blood):
-		self.blood = blood
-
-	def updateIsDead(self, isDead):
-		self.isDead = isDead
+	def updateIsDestroy(self):
+		self.isDestroy = True
 
 	def updateIsVisible(self, isVisible):
 		self.isVisible = isVisible
@@ -32,10 +30,13 @@ class BaseTank(pygame.sprite.Sprite):
 	def shot(self):
 		pass
 
-	def isShoted(self, ):
-		pass
+	def isShoted(self, hp):
+		if hp < self.hp:
+			self.hp -= hp
+			# animation for shoted
+		else:
+			self.isDestroy = True
+			# animation for destroyed
 
 	def perception(self):
 		pass
-
-	def 

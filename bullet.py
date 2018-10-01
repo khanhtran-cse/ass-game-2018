@@ -21,6 +21,7 @@ class Bullet(pygame.sprite.Sprite):
 		self.vect = vect
 		self.start_pos = start_pos
 		self.start_time = pygame.time.get_ticks()
+		self.damage = BULLET_DAMAGE
 
 		
 
@@ -46,9 +47,12 @@ class Bullet(pygame.sprite.Sprite):
 		self.pos = (self.vect*(current_time - self.start_time)*self.speed + self.start_pos)
 
 	def render():
+		vectX = pygame.math.Vector2(1,0)
+		angle = vectX.angle_to(self.vect)
+		image = pygame.transform.rotate(self.image, angle)
 		self.screen.blit(image, self.pos)
 
 	def checkCollisionWithTarget(self, target):
 		""" include collision with tank or enemy's home
 		"""
-
+		pass
