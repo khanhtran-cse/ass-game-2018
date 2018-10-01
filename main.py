@@ -52,7 +52,7 @@ def showGameOverMenu(gameDisplay,score,mousePosition,gameOverText,hintText, hint
     # Draw mouse
     cursorX = mousePosition[0] -12
     cursorY = mousePosition[1] - 12
-    if cursorX < 0: 
+    if cursorX < 0:
         cursorX = 0
     if cursorY < 0:
         cursorY = 0
@@ -76,32 +76,28 @@ def startTank(gameDisplay):
     score = Score(gameDisplay, 15, 10)
     score.setMaxMiss(MAX_MISS)
 
-    #Game over mouse 
+    #Game over mouse
     GAME_OVER_MOUSE = pygame.image.load('./images/cursor-shot.png')
 
     # Init Enemy Tank array
     tanks = []
 
-
-
     # Initial my tank
-    myTank = MyTank(gameDisplay,0,400,id_tank=1,id_group=1,speed_x=0,speed_y=0)
-    # myTank1 = MyTank(gameDisplay, 0,0, id_tank=2, id_group=1)
-    # myTank2 = MyTank(gameDisplay, 0, 0, id_tank=3, id_group=1)
-    # myTank3 = MyTank(gameDisplay, 0, 0, id_tank=4, id_group=1)
-    # myTank_List = [myTank, myTank1,myTank2,myTank3]
+    myTank1 = MyTank(gameDisplay,0,400,id_tank=1,id_group=1,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0,speed_bullet_x=0,speed_bullet_y=0)
+    # myTank2 = MyTank(gameDisplay, 0,0, id_tank=2, id_group=1,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0)
+    # myTank3 = MyTank(gameDisplay, 0, 0, id_tank=3, id_group=1,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0)
+    # myTank4 = MyTank(gameDisplay, 0, 0, id_tank=4, id_group=1,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0)
+    # myTank_List = [myTank1, myTank2,myTank3,myTank4]
 
     #Initial enemy tanks
-    enemyTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0,id_tank=1,id_group=0,speed_x=0,speed_y=0)
-    enemyTank1 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=2, id_group=0,speed_x=0,speed_y=0)
-    enemyTank2 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=3, id_group=0,speed_x=0,speed_y=0)
-    enemyTank3 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=4, id_group=0,speed_x=0,speed_y=0)
+    enemyTank = MyTank(gameDisplay,DISPLAY_WIDTH-100,0,id_tank=1,id_group=0,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0,speed_bullet_x=0,speed_bullet_y=0)
+    enemyTank1 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=2, id_group=0,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0,speed_bullet_x=0,speed_bullet_y=0)
+    enemyTank2 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=3, id_group=0,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0,speed_bullet_x=0,speed_bullet_y=0)
+    enemyTank3 = MyTank(gameDisplay, DISPLAY_WIDTH - 100, 0, id_tank=4, id_group=0,speed_x=0,speed_y=0,x_bullet=0,y_bullet=0,speed_bullet_x=0,speed_bullet_y=0)
     enemyTank_List = [enemyTank,enemyTank1,enemyTank2,enemyTank3]
 
-
     # Initial bullet
-    bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=0, x_start=myTank.x, y_start=myTank.y, x_end=0, y_end=0)
-
+    bullet = Bullet(gameDisplay, id_tank=1, id_group=1, speed=0, x_start=0, y_start=0, x_end=0, y_end=0)
 
     # This is used for defining fps for game.
     # Ex: clock.tick(60) indicates that this game has fps is 60
@@ -119,7 +115,10 @@ def startTank(gameDisplay):
     gameOverText = gameOverFont.render('Game Over', True, (244, 66, 66))
     hintText = hintFont.render('Click here to continue', True, (0,0,0))
 
-    speed_bullet = 0
+    # set speed object
+    speed_bullet_x = 0
+    speed_bullet_y = 0
+
     speed_tank_x  = 0
     speed_tank_y = 0
 
@@ -130,16 +129,20 @@ def startTank(gameDisplay):
             if event.type == pygame.QUIT:
                 return False
 
-            speed_tank_x = myTank.move(event)[0]
-            speed_tank_y = myTank.move(event)[1]
+            #tank
+            speed_tank_x = myTank1.move(event)[0]
+            speed_tank_y = myTank1.move(event)[1]
 
-            # bullet
-            speed_bullet = bullet.motion(event,bullet.bullet[0])
+            #bullet
+            bullet.x_start = myTank1.shoot(event)[0]
+            bullet.y_start = myTank1.shoot(event)[1]
+            speed_bullet_x = myTank1.shoot(event)[2]
+            speed_bullet_y = myTank1.shoot(event)[3]
 
-        bullet.x_start += speed_bullet
-
-        myTank.x += speed_tank_x
-        myTank.y += speed_tank_y
+        bullet.x_start += speed_bullet_x
+        bullet.y_start += speed_bullet_y
+        myTank1.x += speed_tank_x
+        myTank1.y += speed_tank_y
 
         # Reset state to start new game
         if restartGame:
@@ -160,7 +163,7 @@ def startTank(gameDisplay):
 
             # Update the display
             pygame.display.flip()
-            # This will block execution until 1/60 seconds have passed 
+            # This will block execution until 1/60 seconds have passed
             # since the previous time clock.tick was called.
             clock.tick(FPS)
             continue
@@ -183,14 +186,17 @@ def startTank(gameDisplay):
         # for tank in tanks:
         #     tank.draw()
 
+        # Bullet
+        bullet.draw(bullet.bullet[myTank1.index_bullet])
+        print("Object bullet:",bullet)
+
         #Display my tank
-        myTank.draw(myTank.shape[myTank.index_myTank])
+        myTank1.draw(myTank1.shape[myTank1.index_myTank])
+        print("Object tank: ",myTank1)
         #myTank1.draw(myTank1.shape[0])
 
         #Display enemy tank
-        enemyTank_List[0].draw(myTank.shape[0])
-
-        bullet.draw(bullet.bullet[0])
+        enemyTank_List[0].draw(myTank1.shape[0])
 
         # Update the display
         pygame.display.flip()
