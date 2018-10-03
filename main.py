@@ -1,6 +1,7 @@
 from const import *
 from team import Team
 from flag import Flag
+from basetank import BaseTank
 
 def main():
 	clock = pygame.time.Clock()
@@ -22,6 +23,10 @@ def main():
 	teamAllyGroup = pygame.sprite.Group()
 	Team(teamAllyGroup,posAlly,  True)
 
+	#player 
+	playerTank = BaseTank((650, 300))
+	playerTank.tank1_image()
+
 	# flag
 	posFlagEnemy = (650, 20)
 	posFlagAlly = (650, 620)
@@ -38,12 +43,19 @@ def main():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				exit = True
+			# if event.type == pygame.KEYDOWN:
+			# 	if event.key == pygame.K_A:
+
+			# 	else:
+
 		screen.blit(background, (0,0))
 
 		flagGroup.update()
 		flagGroup.draw(screen)
 		teamEnemyGroup.draw(screen)
 		teamAllyGroup.draw(screen)
+
+		screen.blit(playerTank.image, playerTank.pos)
 
 		pygame.display.flip()
 		clock.tick(FPS)

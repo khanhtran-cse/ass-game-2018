@@ -48,3 +48,6 @@ class BaseTank(pygame.sprite.Sprite):
 
 	def perception(self):
 		pass
+
+	def update(self):
+		pass

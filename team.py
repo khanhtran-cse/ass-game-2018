@@ -1,5 +1,5 @@
 from const import *
-from tankbase import BaseTank
+from basetank import BaseTank
 
 class Team: 
 
