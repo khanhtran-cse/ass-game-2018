@@ -18,5 +18,5 @@ class Flag(pygame.sprite.Sprite):
 		self.index += 1
 		if self.index >= self.number_image:
 			self.index = 0
-		print(self.index)
+		# print(self.index)
 		self.image = self.images[self.isEnemy*7 + self.index]

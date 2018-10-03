@@ -1,5 +1,6 @@
 
 from const import *
+from util import *
 
 class BaseTank(pygame.sprite.Sprite):
 
@@ -11,12 +12,19 @@ class BaseTank(pygame.sprite.Sprite):
 	def __init__(self, pos):
 		pygame.sprite.Sprite.__init__(self)
 
-		self.image = pygame.Surface(self.size_image)
-		self.image.fill(COLOR_BLUE)
-		self.rect = (pos, self.size_image)
+		self.image_sprite = pygame.image.load('./images/tank-sprite-png-2.png')
 
 		self.pos = pos
 		self.hp = TANK_HP
+
+	def tank1_image(self):
+		self.image = self.image_sprite.subsurface((182,15,232 - 182,88-15))
+		self.rect = (self.pos, (232 - 182,88-15))
+
+	def tank2_image(self):
+		self.image = self.image_sprite.subsurface((182,345,232 - 182,415-345))
+		self.rect = (self.pos, (232 - 182,415-345))
+
 
 	def updateIsDestroy(self):
 		self.isDestroy = True

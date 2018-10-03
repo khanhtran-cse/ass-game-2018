@@ -13,11 +13,14 @@ def main():
 	background = pygame.transform.scale(background, WINDOW_SIZE)
 
 	# init team 
-	# posEnemy = [(200, 100),(500, 100), (650, 100), (800,100), (1100,100)]
-	# teamEnemy = Team(posEnemy)
+	posEnemy = [(200, 100),(400, 100), (650, 100), (900,100), (1100,100)]
 
-	# posAlly = [(200, 600), (500, 600), (650, 1150), (800, 600), (1100,  600)]
-	# teamAlly = Team(posAlly)
+	teamEnemyGroup = pygame.sprite.Group()
+	Team(teamEnemyGroup,posEnemy, False)
+
+	posAlly = [(200, 500), (400, 500), (650, 500), (900, 500), (1100,  500)]
+	teamAllyGroup = pygame.sprite.Group()
+	Team(teamAllyGroup,posAlly,  True)
 
 	# flag
 	posFlagEnemy = (650, 20)
@@ -39,6 +42,8 @@ def main():
 
 		flagGroup.update()
 		flagGroup.draw(screen)
+		teamEnemyGroup.draw(screen)
+		teamAllyGroup.draw(screen)
 
 		pygame.display.flip()
 		clock.tick(FPS)
