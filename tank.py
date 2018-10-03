@@ -1,179 +1,72 @@
 import pygame
-import random
+import config
+import math
 
-# Define some colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-
-
-# --- Classes
-
-
-class Block(pygame.sprite.Sprite):
-    """ This class represents the block. """
-    def __init__(self, color):
-        # Call the parent class (Sprite) constructor
-        super().__init__()
-
-        self.image = pygame.Surface([20, 20])
-        self.image.fill(color)
-
-        self.rect = self.image.get_rect()
-
-
-class Player(pygame.sprite.Sprite):
-    """ This class represents the Player. """
-
+# each type of game object gets an init and an
+# update function. the update function is called
+# once per frame, and it is when each object should
+# change it's current position and state. the Tank
+# object actually gets a "move" function instead of
+# update, since it is passed extra information about
+# the keyboard
+class Tank(pygame.sprite.Sprite):
+    speed = 7
+    rotate_speed = 10
+    bounce = 24
+    gun_offset = -11
+    images = []
     def __init__(self):
-        """ Set up the player on creation. """
-        # Call the parent class (Sprite) constructor
-        super().__init__()
+        pygame.sprite.Sprite.__init__(self, self.containers)
+        self.image = self.images[0]
+        self.width = self.image.get_width()
+        self.rect = self.image.get_rect(midbottom=config.SCREENRECT.midbottom)
+        self.reloading = 0
+        self.origtop = self.rect.top
+        self.facing = -1
+        self.angle = 0
+        self.isDestroy = False
 
-        self.image = pygame.Surface([20, 20])
-        self.image.fill(RED)
+    def calculateHeadDelta(self,distance):
+        x = 0
+        y = 0
+        alpha = self.angle/18*math.pi
+        y = -1*distance* math.sin(alpha)
+        x = distance*math.cos(alpha)
+        return (x,y)        
 
-        self.rect = self.image.get_rect()
+    def move(self, direction):
+        if(self.isDestroy):
+            return
+        # if direction: self.facing = direction
+        if(direction == 'head'):
+            # calculate new x, y
+            x,y = self.calculateHeadDelta(Tank.speed)
+            self.rect.move_ip(x,y)
+        elif(direction == 'back'):
+            x,y = self.calculateHeadDelta(Tank.speed)
+            self.rect.move_ip(-x,-y)
+        elif (direction =='right'):
+            self.angle -= 1
+            if(self.angle < 0):
+                self.angle += 36
+            self.image = self.images[self.angle]
+            newcenter = self.rect.center
+            self.rect = self.image.get_rect(center=newcenter)
+        elif (direction == 'left'):
+            self.angle += 1
+            if(self.angle >= 36):
+                self.angle -= 36
+            self.image = self.images[self.angle]
+            newcenter = self.rect.center
+            self.rect = self.image.get_rect(center=newcenter)
+        self.rect = self.rect.clamp(config.SCREENRECT)  
 
-    def update(self):
-        """ Update the player's position. """
-        # Get the current mouse position. This returns the position
-        # as a list of two numbers.
+    #Get the initialize position of the shot
+    def gunpos(self):
+        pos = self.rect.center
+        x,y = self.calculateHeadDelta(self.width/2)
+        return (pos[0] + x, pos[1] + y, self.angle)
 
-        # Set the player x position to the mouse x position
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                self.rect.x += 3
-            elif event.key == pygame.K_LEFT:
-                self.rect.x += -3
-            elif event.key == pygame.K_UP:
-                self.rect.y += -3
-            elif event.key == pygame.K_DOWN:
-                self.rect.y += 3
-
-
-class Bullet(pygame.sprite.Sprite):
-    """ This class represents the bullet . """
-    def __init__(self):
-        # Call the parent class (Sprite) constructor
-        super().__init__()
-
-        self.image = pygame.Surface([5, 5])
-        self.image.fill(BLACK)
-
-        self.rect = self.image.get_rect()
-
-    def update(self):
-        """ Move the bullet. """
-        self.rect.y -= 2
-
-
-
-# --- Create the window
-
-# Initialize Pygame
-pygame.init()
-
-# Set the height and width of the screen
-screen_width = 1050
-screen_height = 700
-screen = pygame.display.set_mode([screen_width, screen_height])
-
-# --- Sprite lists
-
-# This is a list of every sprite. All blocks and the player block as well.
-all_sprites_list = pygame.sprite.Group()
-
-# List of each block in the game
-block_list = pygame.sprite.Group()
-
-# List of each bullet
-bullet_list = pygame.sprite.Group()
-
-# --- Create the sprites
-
-for i in range(50):
-    # This represents a block
-    block = Block(BLUE)
-
-    # Set a random location for the block
-    block.rect.x = random.randrange(screen_width)
-    block.rect.y = random.randrange(350)
-
-    # Add the block to the list of objects
-    block_list.add(block)
-    all_sprites_list.add(block)
-
-
-# Create a red player block
-player = Player()
-all_sprites_list.add(player)
-
-# Loop until the user clicks the close button.
-done = False
-
-# Used to manage how fast the screen updates
-clock = pygame.time.Clock()
-
-score = 0
-player.rect.y = 370
-
-
-# -------- Main Program Loop -----------
-while not done:
-    # --- Event Processing
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                # Fire a bullet if the user clicks the mouse button
-                bullet = Bullet()
-                # Set the bullet so it is where the player is
-                bullet.rect.x = player.rect.x
-                bullet.rect.y = player.rect.y
-                # Add the bullet to the lists
-                all_sprites_list.add(bullet)
-                bullet_list.add(bullet)
-
-
-    # --- Game logic
-
-    # Call the update() method on all the sprites
-    all_sprites_list.update()
-
-    # Calculate mechanics for each bullet
-    for bullet in bullet_list:
-
-        # See if it hit a block
-        block_hit_list = pygame.sprite.spritecollide(bullet, block_list, True)
-
-        # For each block hit, remove the bullet and add to the score
-        for block in block_hit_list:
-            bullet_list.remove(bullet)
-            all_sprites_list.remove(bullet)
-            score += 1
-            print(score)
-
-        # Remove the bullet if it flies up off the screen
-        if bullet.rect.y < -10:
-            bullet_list.remove(bullet)
-            all_sprites_list.remove(bullet)
-
-    # --- Draw a frame
-
-    # Clear the screen
-    screen.fill(WHITE)
-
-    # Draw all the spites
-    all_sprites_list.draw(screen)
-
-    # Go ahead and update the screen with what we've drawn.
-    pygame.display.flip()
-
-    # --- Limit to 20 frames per second
-    clock.tick(60)
-
-pygame.quit()
+    def destroy(self):
+        self.isDestroy = True
+        self.rect.move_ip(-1000,-1000)

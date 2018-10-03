@@ -1,2 +1,3 @@
-# ass-game-2018
-python tank.py
+# Game TANK
+To play this game, run:
+    ```python3 main.py```
