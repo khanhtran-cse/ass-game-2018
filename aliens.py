@@ -13,7 +13,7 @@ if not pygame.image.get_extended():
 
 
 #game constants
-MAX_SHOTS      = 5     #most player bullets onscreen
+MAX_SHOTS      = 2     #most player bullets onscreen
 ALIEN_ODDS     = 22     #chances a new alien appears
 BOMB_ODDS      = 60    #chances a new bomb will drop
 ALIEN_RELOAD   = 12     #frames between new aliens
@@ -90,7 +90,6 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, direction):
         if(self.isDestroy):
-            self.rect.move_ip(-1000,-1000)
             return
         # if direction: self.facing = direction
         if(direction == 'head'):
@@ -130,6 +129,8 @@ class Player(pygame.sprite.Sprite):
 
     def destroy(self):
         self.isDestroy = True
+        self.rect.move_ip(-1000,-1000)
+
 
 class Alien(pygame.sprite.Sprite):
     speed = 13
@@ -173,8 +174,11 @@ class Explosion(pygame.sprite.Sprite):
 class Shot(pygame.sprite.Sprite):
     speed = 15
     images = []
-    def __init__(self, pos):
-        pygame.sprite.Sprite.__init__(self, self.containers)
+    def __init__(self, pos, type):
+        containers = Shot.containersA
+        if(type == 'B'):
+            containers = Shot.containersB
+        pygame.sprite.Sprite.__init__(self, containers)
         self.image = self.images[pos[2]]
         self.angle = pos[2]
         self.rect = self.image.get_rect(midbottom=(pos[0],pos[1]))
@@ -291,7 +295,9 @@ def main(winstyle = 0):
 
     # Initialize Game Groups
     aliens = pygame.sprite.Group()
-    shots = pygame.sprite.Group()
+    shotsA = pygame.sprite.Group()
+    shotsB = pygame.sprite.Group()
+
     bombs = pygame.sprite.Group()
     all = pygame.sprite.RenderUpdates()
     lastalien = pygame.sprite.GroupSingle()
@@ -299,7 +305,8 @@ def main(winstyle = 0):
     #assign default groups to each sprite class
     Player.containers = all
     Alien.containers = aliens, all, lastalien
-    Shot.containers = shots, all
+    Shot.containersA = shotsA, all
+    Shot.containersB = shotsB, all
     Bomb.containers = bombs, all
     Explosion.containers = all
     Score.containers = all
@@ -313,12 +320,13 @@ def main(winstyle = 0):
     #initialize our starting sprites
     global SCORE
     player = Player()
-    Alien() #note, this 'lives' because it goes into a sprite group
+    player2 = Player()
+    # Alien() #note, this 'lives' because it goes into a sprite group
     if pygame.font:
         all.add(Score())
 
     overgameTime = 2000/40
-    while player.alive():
+    while player.alive() and player2.alive():
 
         #get input
         for event in pygame.event.get():
@@ -333,7 +341,7 @@ def main(winstyle = 0):
         #update all the sprites
         all.update()
 
-        #handle player input
+        #handle player 1 input
         if(keystate[K_UP]):
             player.move('head')
         elif(keystate[K_DOWN]):
@@ -342,53 +350,80 @@ def main(winstyle = 0):
             player.move('left')
         elif(keystate[K_RIGHT]):
             player.move('right')
+
+        #handle player 2 input
+        if(keystate[K_w]):
+            player2.move('head')
+        elif(keystate[K_s]):
+            player2.move('back')
+        elif(keystate[K_a]):
+            player2.move('left')
+        elif(keystate[K_d]):
+            player2.move('right')
         # direction = keystate[K_RIGHT] - keystate[K_LEFT]
         # player.move(direction)
-        firing = keystate[K_SPACE] and not player.isDestroy
-        if not player.reloading and firing and len(shots) < MAX_SHOTS:
-            Shot(player.gunpos())
+        firing = keystate[K_COMMA] and not player.isDestroy
+        if not player.reloading and firing and len(shotsA) < MAX_SHOTS:
+            Shot(player.gunpos(),'A')
             shoot_sound.play()
         player.reloading = firing
 
-        # # Create new alien
-        if alienreload:
-            alienreload = alienreload - 1
-        elif not int(random.random() * ALIEN_ODDS):
-            Alien()
-            alienreload = ALIEN_RELOAD
+        #Player 2 shot
+        firing = keystate[K_SPACE] and not player2.isDestroy
+        if not player2.reloading and firing and len(shotsB) < MAX_SHOTS:
+            Shot(player2.gunpos(),'B')
+            shoot_sound.play()
+        player2.reloading = firing
+
+        # # # Create new alien
+        # if alienreload:
+        #     alienreload = alienreload - 1
+        # elif not int(random.random() * ALIEN_ODDS):
+        #     Alien()
+        #     alienreload = ALIEN_RELOAD
 
         # Drop bombs
-        if lastalien and not int(random.random() * BOMB_ODDS):
-            Bomb(lastalien.sprite)
+        # if lastalien and not int(random.random() * BOMB_ODDS):
+        #     Bomb(lastalien.sprite)
 
         # Detect collisions
-        for alien in pygame.sprite.spritecollide(player, aliens, 1):
+        for shot in pygame.sprite.spritecollide(player, shotsB, 1):
             boom_sound.play()
-            Explosion(alien)
             Explosion(player)
+            Explosion(shot)
             SCORE = SCORE + 1
             player.destroy()
 
-        for alien in pygame.sprite.groupcollide(shots, aliens, 1, 1).keys():
+        for shot in pygame.sprite.spritecollide(player2, shotsA, 1):
             boom_sound.play()
-            Explosion(alien)
+            Explosion(player2)
+            Explosion(shot)
             SCORE = SCORE + 1
+            player2.destroy()
 
-        for bomb in pygame.sprite.spritecollide(player, bombs, 1):
-            boom_sound.play()
-            Explosion(player)
-            Explosion(bomb)
-            player.destroy()
+        # for alien in pygame.sprite.groupcollide(shots, aliens, 1, 1).keys():
+        #     boom_sound.play()
+        #     Explosion(alien)
+        #     SCORE = SCORE + 1
+
+        # for bomb in pygame.sprite.spritecollide(player, bombs, 1):
+        #     boom_sound.play()
+        #     Explosion(player)
+        #     Explosion(bomb)
+        #     player.destroy()
 
         #draw the scene
         dirty = all.draw(screen)
         pygame.display.update(dirty)
 
-        if(player.isDestroy):
+        if(player.isDestroy or player2.isDestroy):
             overgameTime-=1
 
         if(overgameTime < 0):
-            player.kill()
+            if(player.isDestroy):
+                player.kill()
+            if(player2.isDestroy):
+                player2.kill()
         #cap the framerate
         clock.tick(40)
 
