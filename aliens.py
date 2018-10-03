@@ -17,7 +17,7 @@ MAX_SHOTS      = 5     #most player bullets onscreen
 ALIEN_ODDS     = 22     #chances a new alien appears
 BOMB_ODDS      = 60    #chances a new bomb will drop
 ALIEN_RELOAD   = 12     #frames between new aliens
-SCREENRECT     = Rect(0, 0, 640, 480)
+SCREENRECT     = Rect(0, 0, 1000, 700)
 SCORE          = 0
 
 main_dir = os.path.split(os.path.abspath(__file__))[0]
@@ -63,7 +63,7 @@ def load_sound(file):
 
 
 class Player(pygame.sprite.Sprite):
-    speed = 10
+    speed = 7
     rotate_speed = 10
     bounce = 24
     gun_offset = -11
@@ -71,18 +71,19 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = self.images[0]
+        self.width = self.image.get_width()
         self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
         self.reloading = 0
         self.origtop = self.rect.top
         self.facing = -1
         self.angle = 0
 
-    def calculateDelta(self):
+    def calculateHeadDelta(self,distance):
         x = 0
         y = 0
         alpha = self.angle/18*math.pi
-        y = -1*Player.speed* math.sin(alpha)
-        x = Player.speed*math.cos(alpha)
+        y = -1*distance* math.sin(alpha)
+        x = distance*math.cos(alpha)
         return (x,y)        
 
 
@@ -90,10 +91,10 @@ class Player(pygame.sprite.Sprite):
         # if direction: self.facing = direction
         if(direction == 'head'):
             # calculate new x, y
-            x,y = self.calculateDelta()
+            x,y = self.calculateHeadDelta(Player.speed)
             self.rect.move_ip(x,y)
         elif(direction == 'back'):
-            x,y = self.calculateDelta()
+            x,y = self.calculateHeadDelta(Player.speed)
             self.rect.move_ip(-x,-y)
         elif (direction =='right'):
             self.angle -= 1
@@ -112,8 +113,16 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.rect.clamp(SCREENRECT)  
 
     def gunpos(self):
-        pos = self.facing*self.gun_offset + self.rect.centerx
-        return pos, self.rect.top
+        pos = self.rect.center
+        x,y = self.calculateHeadDelta(self.width/2)
+        # if(self.angle >= 9 and self.angle < 27):
+        #     pos = self.rect.midleft
+        # else:
+        #     pos = self.rect.midright
+        # print(pos)
+        # pos = self.facing*self.gun_offset + self.rect.centerx
+        # print(pos,self.rect.top)
+        return (pos[0] + x, pos[1] + y, self.angle)
 
 
 class Alien(pygame.sprite.Sprite):
@@ -156,16 +165,26 @@ class Explosion(pygame.sprite.Sprite):
 
 
 class Shot(pygame.sprite.Sprite):
-    speed = -11
+    speed = 15
     images = []
     def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.image = self.images[0]
-        self.rect = self.image.get_rect(midbottom=pos)
+        self.image = self.images[pos[2]]
+        self.angle = pos[2]
+        self.rect = self.image.get_rect(midbottom=(pos[0],pos[1]))
+
+    def calculateHeadDelta(self,distance):
+        x = 0
+        y = 0
+        alpha = self.angle/18*math.pi
+        y = -1*distance* math.sin(alpha)
+        x = distance*math.cos(alpha)
+        return (x,y) 
 
     def update(self):
-        self.rect.move_ip(0, self.speed)
-        if self.rect.top <= 0:
+        x,y = self.calculateHeadDelta(Shot.speed)
+        self.rect.move_ip(x, y)
+        if self.rect.top <= 0 or self.rect.left <= 0 or self.rect.right >= SCREENRECT.right or self.rect.bottom >= SCREENRECT.bottom:
             self.kill()
 
 
@@ -202,15 +221,6 @@ class Score(pygame.sprite.Sprite):
             self.image = self.font.render(msg, 0, self.color)
 
 def initTankImage():
-    # base = load_images('tank-0.png','tank-10.png','tank-20.png',
-    # 'tank-30.png','tank-40.png','tank-50.png','tank-60.png','tank-70.png','tank-80.png')
-    # base90 = []
-    # base180 = []
-    # base270 = []
-    # i = 0
-    # while(i < 9):
-    #     base90[i] = pygame.transform.flip(base[i], 1, 0)
-    # full_image = [...base,]
     img = load_image('tank-0.png')
     i = 0
     imgs = []
@@ -218,6 +228,15 @@ def initTankImage():
         imgs.append(pygame.transform.rotate(img,i*10))
         i+=1
     Player.images = imgs
+
+def initShotImage():
+    img = load_image('shot.png')
+    i = 0
+    imgs = []
+    while(i<36):
+        imgs.append(pygame.transform.rotate(img,i*10))
+        i+=1
+    Shot.images = imgs
 
 def main(winstyle = 0):
     # Initialize pygame
@@ -239,7 +258,8 @@ def main(winstyle = 0):
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
     Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
     Bomb.images = [load_image('bomb.gif')]
-    Shot.images = [load_image('shot.gif')]
+    initShotImage()
+    # Shot.images = [load_image('shot.gif')]
 
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
@@ -325,11 +345,11 @@ def main(winstyle = 0):
         player.reloading = firing
 
         # # Create new alien
-        # if alienreload:
-        #     alienreload = alienreload - 1
-        # elif not int(random.random() * ALIEN_ODDS):
-        #     Alien()
-        #     alienreload = ALIEN_RELOAD
+        if alienreload:
+            alienreload = alienreload - 1
+        elif not int(random.random() * ALIEN_ODDS):
+            Alien()
+            alienreload = ALIEN_RELOAD
 
         # Drop bombs
         if lastalien and not int(random.random() * BOMB_ODDS):
