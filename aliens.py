@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import random, os.path
+import math
 
 #import basic pygame modules
 import pygame
@@ -63,6 +64,7 @@ def load_sound(file):
 
 class Player(pygame.sprite.Sprite):
     speed = 10
+    rotate_speed = 10
     bounce = 24
     gun_offset = -11
     images = []
@@ -73,17 +75,41 @@ class Player(pygame.sprite.Sprite):
         self.reloading = 0
         self.origtop = self.rect.top
         self.facing = -1
+        self.angle = 0
+
+    def calculateDelta(self):
+        x = 0
+        y = 0
+        alpha = self.angle/18*math.pi
+        y = -1*Player.speed* math.sin(alpha)
+        x = Player.speed*math.cos(alpha)
+        return (x,y)        
+
 
     def move(self, direction):
-        if direction: self.facing = direction
-
-        self.rect.move_ip(direction*self.speed, 0)
-        self.rect = self.rect.clamp(SCREENRECT)
-        if direction < 0:
-            self.image = self.images[0]
-        elif direction > 0:
-            self.image = self.images[1]
-        self.rect.top = self.origtop - (self.rect.left//self.bounce%2)
+        # if direction: self.facing = direction
+        if(direction == 'head'):
+            # calculate new x, y
+            x,y = self.calculateDelta()
+            self.rect.move_ip(x,y)
+        elif(direction == 'back'):
+            x,y = self.calculateDelta()
+            self.rect.move_ip(-x,-y)
+        elif (direction =='right'):
+            self.angle -= 1
+            if(self.angle < 0):
+                self.angle += 36
+            self.image = self.images[self.angle]
+            newcenter = self.rect.center
+            self.rect = self.image.get_rect(center=newcenter)
+        elif (direction == 'left'):
+            self.angle += 1
+            if(self.angle >= 36):
+                self.angle -= 36
+            self.image = self.images[self.angle]
+            newcenter = self.rect.center
+            self.rect = self.image.get_rect(center=newcenter)
+        self.rect = self.rect.clamp(SCREENRECT)  
 
     def gunpos(self):
         pos = self.facing*self.gun_offset + self.rect.centerx
@@ -175,7 +201,23 @@ class Score(pygame.sprite.Sprite):
             msg = "Score: %d" % SCORE
             self.image = self.font.render(msg, 0, self.color)
 
-
+def initTankImage():
+    # base = load_images('tank-0.png','tank-10.png','tank-20.png',
+    # 'tank-30.png','tank-40.png','tank-50.png','tank-60.png','tank-70.png','tank-80.png')
+    # base90 = []
+    # base180 = []
+    # base270 = []
+    # i = 0
+    # while(i < 9):
+    #     base90[i] = pygame.transform.flip(base[i], 1, 0)
+    # full_image = [...base,]
+    img = load_image('tank-0.png')
+    i = 0
+    imgs = []
+    while(i<36):
+        imgs.append(pygame.transform.rotate(img,i*10))
+        i+=1
+    Player.images = imgs
 
 def main(winstyle = 0):
     # Initialize pygame
@@ -191,8 +233,8 @@ def main(winstyle = 0):
 
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
-    img = load_image('tank-move-up.png')
-    Player.images = [img, pygame.transform.flip(img, 1, 0)]
+    # img = load_image('tank-move-up.png')
+    initTankImage()
     img = load_image('explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
     Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
@@ -266,20 +308,28 @@ def main(winstyle = 0):
         all.update()
 
         #handle player input
-        direction = keystate[K_RIGHT] - keystate[K_LEFT]
-        player.move(direction)
+        if(keystate[K_UP]):
+            player.move('head')
+        elif(keystate[K_DOWN]):
+            player.move('back')
+        elif(keystate[K_LEFT]):
+            player.move('left')
+        elif(keystate[K_RIGHT]):
+            player.move('right')
+        # direction = keystate[K_RIGHT] - keystate[K_LEFT]
+        # player.move(direction)
         firing = keystate[K_SPACE]
         if not player.reloading and firing and len(shots) < MAX_SHOTS:
             Shot(player.gunpos())
             shoot_sound.play()
         player.reloading = firing
 
-        # Create new alien
-        if alienreload:
-            alienreload = alienreload - 1
-        elif not int(random.random() * ALIEN_ODDS):
-            Alien()
-            alienreload = ALIEN_RELOAD
+        # # Create new alien
+        # if alienreload:
+        #     alienreload = alienreload - 1
+        # elif not int(random.random() * ALIEN_ODDS):
+        #     Alien()
+        #     alienreload = ALIEN_RELOAD
 
         # Drop bombs
         if lastalien and not int(random.random() * BOMB_ODDS):
