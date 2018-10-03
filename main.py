@@ -41,7 +41,8 @@ def main(winstyle = 0):
 
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
-    Tank.images = Util.getTankImages()
+    Tank.imagesA = Util.getTankImages('A')
+    Tank.imagesB = Util.getTankImages('B')
     img = Util.load_image('explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
     Shot.images = Util.getShotImages()

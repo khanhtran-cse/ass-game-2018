@@ -12,17 +12,23 @@ import random
 # the keyboard
 class Tank(pygame.sprite.Sprite):
     speed = 7
-    rotate_speed = 10
+    rotate_speed = 5
     bounce = 24
     gun_offset = -11
     images = []
     def __init__(self, type):
         containers = self.containersA
+        self.images = self.imagesA
+        self.angle = 0
         if(type == 'B'):
+            self.angle = 18
             containers = self.containersB
+            self.images = self.imagesB
         pygame.sprite.Sprite.__init__(self, containers)
-        
-        self.image = self.images[0]
+        self.type = type
+        self.rotateCount = 0
+
+        self.image = self.images[self.angle]
         self.width = self.image.get_width()
 
         centerX = config.SCREENRECT.centerx
@@ -37,7 +43,6 @@ class Tank(pygame.sprite.Sprite):
         self.reloading = 0
         self.origtop = self.rect.top
         self.facing = -1
-        self.angle = 0
         self.isDestroy = False
 
     def calculateHeadDelta(self,distance):
@@ -55,24 +60,32 @@ class Tank(pygame.sprite.Sprite):
         if(direction == 'head'):
             # calculate new x, y
             x,y = self.calculateHeadDelta(Tank.speed)
+            self.rotateCount = 0
             self.rect.move_ip(x,y)
         elif(direction == 'back'):
             x,y = self.calculateHeadDelta(Tank.speed)
             self.rect.move_ip(-x,-y)
+            self.rotateCount = 0
         elif (direction =='right'):
-            self.angle -= 1
-            if(self.angle < 0):
-                self.angle += 36
-            self.image = self.images[self.angle]
-            newcenter = self.rect.center
-            self.rect = self.image.get_rect(center=newcenter)
+            self.rotateCount +=1
+            if(self.rotateCount > self.rotate_speed):
+                self.rotateCount = 0
+                self.angle -= 1
+                if(self.angle < 0):
+                    self.angle += 36
+                self.image = self.images[self.angle]
+                newcenter = self.rect.center
+                self.rect = self.image.get_rect(center=newcenter)
         elif (direction == 'left'):
-            self.angle += 1
-            if(self.angle >= 36):
-                self.angle -= 36
-            self.image = self.images[self.angle]
-            newcenter = self.rect.center
-            self.rect = self.image.get_rect(center=newcenter)
+            self.rotateCount +=1
+            if(self.rotateCount > self.rotate_speed):
+                self.rotateCount = 0
+                self.angle += 1
+                if(self.angle >= 36):
+                    self.angle -= 36
+                self.image = self.images[self.angle]
+                newcenter = self.rect.center
+                self.rect = self.image.get_rect(center=newcenter)
         self.rect = self.rect.clamp(config.SCREENRECT)  
 
     #Get the initialize position of the shot
