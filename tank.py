@@ -1,6 +1,7 @@
 import pygame
 import config
 import math
+import random
 
 # each type of game object gets an init and an
 # update function. the update function is called
@@ -15,11 +16,24 @@ class Tank(pygame.sprite.Sprite):
     bounce = 24
     gun_offset = -11
     images = []
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self, self.containers)
+    def __init__(self, type):
+        containers = self.containersA
+        if(type == 'B'):
+            containers = self.containersB
+        pygame.sprite.Sprite.__init__(self, containers)
+        
         self.image = self.images[0]
         self.width = self.image.get_width()
-        self.rect = self.image.get_rect(midbottom=config.SCREENRECT.midbottom)
+
+        centerX = config.SCREENRECT.centerx
+        y = random.randint(self.image.get_height(),config.WINDOWS_HEIGHT)
+        x = 0
+        if(type == 'A'):
+            x = random.randint(self.width/2,centerX - self.width/2)
+        else:
+            x = random.randint(centerX + self.width/2, config.WINDOWS_WIDTH - self.width/2)
+
+        self.rect = self.image.get_rect(midbottom=(x,y))
         self.reloading = 0
         self.origtop = self.rect.top
         self.facing = -1

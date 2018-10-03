@@ -72,11 +72,15 @@ def main(winstyle = 0):
     shotsA = pygame.sprite.Group()
     shotsB = pygame.sprite.Group()
 
+    tanksA = pygame.sprite.Group()
+    tanksB = pygame.sprite.Group()
+
     all = pygame.sprite.RenderUpdates()
     # lastalien = pygame.sprite.GroupSingle()
 
     #assign default groups to each sprite class
-    Tank.containers = all
+    Tank.containersA = tanksA, all
+    Tank.containersB = tanksB, all
     Shot.containersA = shotsA, all
     Shot.containersB = shotsB, all
     Explosion.containers = all
@@ -89,14 +93,20 @@ def main(winstyle = 0):
 
     #initialize our starting sprites
     global SCORE
-    player = Tank()
-    player2 = Tank()
+    player = Tank('A')
+    player = Tank('A')
+    player = Tank('A')
+    player = Tank('A')
+    player2 = Tank('B')
+    player2 = Tank('B')
+    player2 = Tank('B')
+    player2 = Tank('B')
     # Alien() #note, this 'lives' because it goes into a sprite group
     if pygame.font:
         all.add(Score())
 
     overgameTime = 1000/FPS
-    while player.alive() and player2.alive():
+    while len(tanksA) > 0 and len(tanksB) > 0:
 
         #get input
         for event in pygame.event.get():
@@ -157,19 +167,21 @@ def main(winstyle = 0):
         #     Bomb(lastalien.sprite)
 
         # Detect collisions
-        for shot in pygame.sprite.spritecollide(player, shotsB, 1):
+        colA = pygame.sprite.groupcollide(tanksA, shotsB, True,True)
+        for shot in colA:
             boom_sound.play()
-            Explosion(player)
             Explosion(shot)
+            Explosion(colA[shot][0])
             SCORE = SCORE + 1
-            player.destroy()
+            shot.destroy()
 
-        for shot in pygame.sprite.spritecollide(player2, shotsA, 1):
+        colB = pygame.sprite.groupcollide(tanksB, shotsA, True, True)
+        for shot in colB:
             boom_sound.play()
-            Explosion(player2)
             Explosion(shot)
+            Explosion(colB[shot][0])
             SCORE = SCORE + 1
-            player2.destroy()
+            shot.destroy()
 
         #draw the scene
         dirty = all.draw(screen)
