@@ -77,6 +77,7 @@ class Player(pygame.sprite.Sprite):
         self.origtop = self.rect.top
         self.facing = -1
         self.angle = 0
+        self.isDestroy = False
 
     def calculateHeadDelta(self,distance):
         x = 0
@@ -88,6 +89,9 @@ class Player(pygame.sprite.Sprite):
 
 
     def move(self, direction):
+        if(self.isDestroy):
+            self.rect.move_ip(-1000,-1000)
+            return
         # if direction: self.facing = direction
         if(direction == 'head'):
             # calculate new x, y
@@ -124,6 +128,8 @@ class Player(pygame.sprite.Sprite):
         # print(pos,self.rect.top)
         return (pos[0] + x, pos[1] + y, self.angle)
 
+    def destroy(self):
+        self.isDestroy = True
 
 class Alien(pygame.sprite.Sprite):
     speed = 13
@@ -199,7 +205,7 @@ class Bomb(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.move_ip(0, self.speed)
-        if self.rect.bottom >= 470:
+        if self.rect.bottom >= SCREENRECT.bottom:
             Explosion(self)
             self.kill()
 
@@ -268,7 +274,7 @@ def main(winstyle = 0):
     pygame.mouse.set_visible(0)
 
     #create the background, tile the bgd image
-    bgdtile = load_image('background.gif')
+    bgdtile = load_image('background.png')
     background = pygame.Surface(SCREENRECT.size)
     for x in range(0, SCREENRECT.width, bgdtile.get_width()):
         background.blit(bgdtile, (x, 0))
@@ -311,7 +317,7 @@ def main(winstyle = 0):
     if pygame.font:
         all.add(Score())
 
-
+    overgameTime = 2000/40
     while player.alive():
 
         #get input
@@ -338,7 +344,7 @@ def main(winstyle = 0):
             player.move('right')
         # direction = keystate[K_RIGHT] - keystate[K_LEFT]
         # player.move(direction)
-        firing = keystate[K_SPACE]
+        firing = keystate[K_SPACE] and not player.isDestroy
         if not player.reloading and firing and len(shots) < MAX_SHOTS:
             Shot(player.gunpos())
             shoot_sound.play()
@@ -361,7 +367,7 @@ def main(winstyle = 0):
             Explosion(alien)
             Explosion(player)
             SCORE = SCORE + 1
-            player.kill()
+            player.destroy()
 
         for alien in pygame.sprite.groupcollide(shots, aliens, 1, 1).keys():
             boom_sound.play()
@@ -372,12 +378,17 @@ def main(winstyle = 0):
             boom_sound.play()
             Explosion(player)
             Explosion(bomb)
-            player.kill()
+            player.destroy()
 
         #draw the scene
         dirty = all.draw(screen)
         pygame.display.update(dirty)
 
+        if(player.isDestroy):
+            overgameTime-=1
+
+        if(overgameTime < 0):
+            player.kill()
         #cap the framerate
         clock.tick(40)
 
