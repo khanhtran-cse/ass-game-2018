@@ -22,7 +22,7 @@ if not pygame.image.get_extended():
     raise SystemExit("Sorry, extended image module required")
 
 #game constants
-MAX_SHOTS      = 2     #most player bullets onscreen
+MAX_SHOTS      = 4     #most player bullets onscreen
 ALIEN_ODDS     = 22     #chances a new alien appears
 ALIEN_RELOAD   = 12     #frames between new aliens
 SCREENRECT     = config.SCREENRECT
@@ -110,7 +110,7 @@ def main(winstyle = 0):
     #initialize our starting sprites
     global SCORE
     player = Tank('A')
-    player.setActive(True)
+    # player.setActive(True)
     activeAIndex = 0
 
     Tank('A')
@@ -195,17 +195,17 @@ def main(winstyle = 0):
         # direction = keystate[K_RIGHT] - keystate[K_LEFT]
         # player.move(direction)
         firing = keystate[K_COMMA] and not player.isDestroy
-        if not player.reloading and firing and len(shotsA) < MAX_SHOTS:
-            Shot(player.gunpos(),'A')
-            shoot_sound.play()
-        player.reloading = firing
+        if(len(shotsA) < MAX_SHOTS):
+            if(player.isAllowedGun()):
+                Shot(player.gunpos(),'A')
+                shoot_sound.play()
 
         #Player 2 shot
         firing = keystate[K_SPACE] and not player2.isDestroy
-        if not player2.reloading and firing and len(shotsB) < MAX_SHOTS:
-            Shot(player2.gunpos(),'B')
-            shoot_sound.play()
-        player2.reloading = firing
+        if(len(shotsB) < MAX_SHOTS):
+            if(player2.isAllowedGun()):
+                Shot(player2.gunpos(),'B')
+                shoot_sound.play()
 
         # # # Create new alien
         # if alienreload:
@@ -217,6 +217,20 @@ def main(winstyle = 0):
         # Drop bombs
         # if lastalien and not int(random.random() * BOMB_ODDS):
         #     Bomb(lastalien.sprite)
+
+        for index,spr in enumerate(tanksA):
+            spr.autoMove(tanksB)
+            if(not spr.isActive() and len(shotsA) < MAX_SHOTS -1):
+                if(spr.isAllowedGun()):
+                    Shot(spr.gunpos(),'A')
+                    shoot_sound.play()
+                
+        for index,spr in enumerate(tanksB):
+            spr.autoMove(tanksA)
+            if(not spr.isActive() and len(shotsB) < MAX_SHOTS -1):
+                if(spr.isAllowedGun()):
+                    Shot(spr.gunpos(),'B')
+                    shoot_sound.play()
 
         # Detect collisions
         colA = pygame.sprite.groupcollide(tanksA, shotsB, True,True)
