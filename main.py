@@ -7,7 +7,7 @@ import math
 import pygame
 from pygame.locals import *
 
-from Tank import Tank
+from tank import Tank
 from Shot import Shot
 from Score import Score
 from Explosion import Explosion
