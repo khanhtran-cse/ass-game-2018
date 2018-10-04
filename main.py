@@ -15,6 +15,8 @@ from Explosion import Explosion
 import Util
 import config
 
+import time
+
 #see if we can load more than standard BMP
 if not pygame.image.get_extended():
     raise SystemExit("Sorry, extended image module required")
@@ -26,6 +28,17 @@ ALIEN_RELOAD   = 12     #frames between new aliens
 SCREENRECT     = config.SCREENRECT
 SCORE          = 0
 FPS = config.FPS
+LOCK_TIME = 0.5
+
+def getSpriteByPosition(position,group):
+    for index,spr in enumerate(group):
+        if (index == position):
+            return spr
+    return False
+
+def deactiveGroup(group):
+    for index,spr in enumerate(group):
+        spr.setActive(False)
 
 def main(winstyle = 0):
     # Initialize pygame
@@ -41,8 +54,10 @@ def main(winstyle = 0):
 
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
-    Tank.imagesA = Util.getTankImages('A')
-    Tank.imagesB = Util.getTankImages('B')
+    Tank.imagesA = Util.getTankImages('tank-A.png')
+    Tank.imagesB = Util.getTankImages('tank-B.png')
+    Tank.imagesAActive = Util.getTankImages('tank-A-active.png')
+    Tank.imagesBActive = Util.getTankImages('tank-B-active.png')
     img = Util.load_image('explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
     Shot.images = Util.getShotImages()
@@ -50,7 +65,7 @@ def main(winstyle = 0):
     #decorate the game window
     # icon = pygame.transform.scale(Alien.images[0], (32, 32))
     # pygame.display.set_icon(icon)
-    pygame.display.set_caption('Pygame Aliens')
+    pygame.display.set_caption('Tank Battle')
     pygame.mouse.set_visible(0)
 
     #create the background, tile the bgd image
@@ -95,17 +110,27 @@ def main(winstyle = 0):
     #initialize our starting sprites
     global SCORE
     player = Tank('A')
-    player = Tank('A')
-    player = Tank('A')
-    player = Tank('A')
+    player.setActive(True)
+    activeAIndex = 0
+
+    Tank('A')
+    Tank('A')
+    Tank('A')
+    
     player2 = Tank('B')
-    player2 = Tank('B')
-    player2 = Tank('B')
-    player2 = Tank('B')
+    player2.setActive(True)
+    activeBIndex = 0
+
+    Tank('B')
+    Tank('B')
+    Tank('B')
     # Alien() #note, this 'lives' because it goes into a sprite group
     if pygame.font:
         all.add(Score())
 
+
+    activeALock = 0
+    activeBLock = 0
     overgameTime = 1000/FPS
     while len(tanksA) > 0 and len(tanksB) > 0:
 
@@ -121,6 +146,32 @@ def main(winstyle = 0):
 
         #update all the sprites
         all.update()
+
+        currentTime = time.time()
+        if(keystate[K_PERIOD] and currentTime > activeALock):
+            #change active of A
+            activeALock = currentTime + LOCK_TIME
+
+            activeAIndex += 1
+            deactiveGroup(tanksA)
+            if(activeAIndex >= len(tanksA)):
+                activeAIndex = 0
+
+            if(len(tanksA) > 0):
+                player = getSpriteByPosition(activeAIndex,tanksA)
+                player.setActive(True)
+        
+        if(keystate[K_b] and currentTime > activeBLock):
+            activeBLock = currentTime + LOCK_TIME
+            #change active of B
+            activeBIndex += 1
+            deactiveGroup(tanksB)
+            if(activeBIndex >= len(tanksB)):
+                activeBIndex = 0
+
+            if(len(tanksB) > 0):
+                player2 = getSpriteByPosition(activeBIndex,tanksB)
+                player2.setActive(True)
 
         #handle player 1 input
         if(keystate[K_UP]):

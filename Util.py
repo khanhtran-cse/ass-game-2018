@@ -36,11 +36,8 @@ def load_sound(file):
         print ('Warning, unable to load, %s' % file)
     return dummysound()
 
-def getTankImages(type):
-    path = 'tank-A.png'
-    if(type == 'B'):
-        path = 'tank-B.png'
-    img = load_image(path)
+def getTankImages(name):
+    img = load_image(name)
     i = 0
     imgs = []
     while(i<36):

@@ -10,11 +10,20 @@ import random
 # object actually gets a "move" function instead of
 # update, since it is passed extra information about
 # the keyboard
+tankAId = 1
+tankBId = 1
+
 class Tank(pygame.sprite.Sprite):
+    tankAId = 1
+    tankBId = 1
     speed = 7
     rotate_speed = 5
     bounce = 24
     gun_offset = -11
+    imagesA = []
+    imagesB = []
+    imagesAActive = []
+    imagesBActive = []
     images = []
     def __init__(self, type):
         containers = self.containersA
@@ -44,6 +53,33 @@ class Tank(pygame.sprite.Sprite):
         self.origtop = self.rect.top
         self.facing = -1
         self.isDestroy = False
+        self.active = False
+        if(self.type == 'A'):
+            self.id = Tank.tankAId
+            Tank.tankAId+=1
+        else:
+            self.id = Tank.tankBId
+            Tank.tankBId +=1
+
+    def setActive(self,enable):
+        if(self.active == enable):
+            return
+            
+        self.active = enable
+        if(enable):
+            if(self.type == 'A'):
+                self.images = self.imagesAActive
+            else:
+                self.images = self.imagesBActive
+        else:
+            if(self.type == 'A'):
+                self.images = self.imagesA
+            else:
+                self.images = self.imagesB
+
+        self.image = self.images[self.angle]
+        newcenter = self.rect.center
+        self.rect = self.image.get_rect(center=newcenter)
 
     def calculateHeadDelta(self,distance):
         x = 0
