@@ -53,3 +53,9 @@ def getShotImages():
         imgs.append(pygame.transform.rotate(img,i*10))
         i+=1
     return imgs
+
+def getSpriteByPosition(position,group):
+    for index,spr in enumerate(group):
+        if (index == position):
+            return spr
+    return False

@@ -14,6 +14,9 @@ class Shot(pygame.sprite.Sprite):
         self.angle = pos[2]
         self.rect = self.image.get_rect(midbottom=(pos[0],pos[1]))
 
+    def getPos(self):
+        return (self.rect[0],self.rect[1],self.angle)
+
     def calculateHeadDelta(self,distance):
         x = 0
         y = 0

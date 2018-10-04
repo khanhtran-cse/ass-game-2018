@@ -7,7 +7,7 @@ import math
 import pygame
 from pygame.locals import *
 
-from tank import Tank
+from Tank import Tank
 from Shot import Shot
 from Score import Score
 from Explosion import Explosion
@@ -113,17 +113,17 @@ def main(winstyle = 0):
     # player.setActive(True)
     activeAIndex = 0
 
-    Tank('A')
-    Tank('A')
-    Tank('A')
+    # Tank('A')
+    # Tank('A')
+    # Tank('A')
     
     player2 = Tank('B')
     player2.setActive(True)
     activeBIndex = 0
 
-    Tank('B')
-    Tank('B')
-    Tank('B')
+    # Tank('B')
+    # Tank('B')
+    # Tank('B')
     # Alien() #note, this 'lives' because it goes into a sprite group
     # if pygame.font:
     #     all.add(Score())
@@ -195,14 +195,14 @@ def main(winstyle = 0):
         # direction = keystate[K_RIGHT] - keystate[K_LEFT]
         # player.move(direction)
         firing = keystate[K_COMMA] and not player.isDestroy
-        if(len(shotsA) < MAX_SHOTS):
+        if(firing and len(shotsA) < MAX_SHOTS):
             if(player.isAllowedGun()):
                 Shot(player.gunpos(),'A')
                 shoot_sound.play()
 
         #Player 2 shot
         firing = keystate[K_SPACE] and not player2.isDestroy
-        if(len(shotsB) < MAX_SHOTS):
+        if(firing and len(shotsB) < MAX_SHOTS):
             if(player2.isAllowedGun()):
                 Shot(player2.gunpos(),'B')
                 shoot_sound.play()
@@ -219,18 +219,20 @@ def main(winstyle = 0):
         #     Bomb(lastalien.sprite)
 
         for index,spr in enumerate(tanksA):
-            spr.autoMove(tanksB)
-            if(not spr.isActive() and len(shotsA) < MAX_SHOTS -1):
-                if(spr.isAllowedGun()):
-                    Shot(spr.gunpos(),'A')
-                    shoot_sound.play()
-                
+            spr.autoMove(tanksB,shotsB)
+            if(not spr.isActive()):
+                if(len(shotsA) < MAX_SHOTS -1):
+                    if(spr.isAllowedGun()):
+                        Shot(spr.gunpos(),'A')
+                        shoot_sound.play()
+                    
         for index,spr in enumerate(tanksB):
-            spr.autoMove(tanksA)
-            if(not spr.isActive() and len(shotsB) < MAX_SHOTS -1):
-                if(spr.isAllowedGun()):
-                    Shot(spr.gunpos(),'B')
-                    shoot_sound.play()
+            spr.autoMove(tanksA,shotsA)
+            if(not spr.isActive()):
+                if(len(shotsB) < MAX_SHOTS -1):
+                    if(spr.isAllowedGun()):
+                        Shot(spr.gunpos(),'B')
+                        shoot_sound.play()
 
         # Detect collisions
         colA = pygame.sprite.groupcollide(tanksA, shotsB, True,True)

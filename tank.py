@@ -4,6 +4,7 @@ import math
 import random
 import AI
 import time
+import Util
 
 # each type of game object gets an init and an
 # update function. the update function is called
@@ -67,7 +68,16 @@ class Tank(pygame.sprite.Sprite):
         self.generateDestination()
 
     def generateDestination(self):
-        self.destination = (random.randint(50,config.WINDOWS_WIDTH-50),random.randint(50,config.WINDOWS_HEIGHT-50))
+        dx,dy = self.calculateHeadDelta(20)
+        c = self.rect.center
+        x = c[0] + dx
+        y = c[1] + dy
+        if(x < 100 or x > config.WINDOWS_WIDTH - 100):
+            x = c[0]
+        if(y < 100 or y > config.WINDOWS_HEIGHT - 100):
+            y = c[1]
+        # self.destination = (random.randint(100,config.WINDOWS_WIDTH-100),random.randint(100,config.WINDOWS_HEIGHT-100))
+        self.destination = (x,y)
 
     def setActive(self,enable):
         if(self.active == enable):
@@ -136,18 +146,18 @@ class Tank(pygame.sprite.Sprite):
     def isActive(self):
         return self.active
 
-    def autoMove(self,enemy):
+    def autoMove(self,enemy,shots):
         if(self.active):
             return
         
-        pos = AI.getDestinationPost(self,enemy,Tank.speed)
+        pos = AI.getDestinationPost(self,enemy,shots,Tank.speed)
         if(pos != 'custom'):
             self.move(pos)
         else:
             center = self.rect.center
             if(center[0] > self.destination[0] -50 and center[0] < self.destination[0] + 50 \
             and center[1] > self.destination[1] - 50 and center[1] < self.destination[1] + 50):
-                self.generateDestination()        
+                self.destination =  Util.getSpriteByPosition(0,enemy).rect.center
             self.moveTo(self.destination[0],self.destination[1])
 
     def moveTo(self,x,y):
@@ -157,18 +167,27 @@ class Tank(pygame.sprite.Sprite):
         d1 = math.sqrt(vt1[0]*vt1[0] + vt1[1]*vt1[1])
         d2 = 10
         cos = 10*vt1[1]/d1/d2
-        print('cos',cos)
+        # print('cos',cos)
         anpla = math.acos(cos)
         realAnpla = 18*anpla/math.pi
 
         rotate = self.angle - realAnpla
-        if(rotate >= -1 and rotate <= 1):
-            self.move('head')
+        if(rotate >= -2 and rotate <= 2):
+            dx,dy = self.calculateHeadDelta(self.speed)
+            dx1 = x - center[0]
+            dx2 = x - center[0] -dx
+            
+            if(dx1 > 0 and dx1 > dx2):
+                self.move('head')
+            elif(dx1 < 0 and dx1 < dx2):
+                self.move('head')
+
+            self.move('back')
         if(rotate < 24 and rotate > 1):
             self.move('left')
         self.move('right')
         
-        print('Rotate to',realAnpla)
+        # print('Rotate to',realAnpla)
 
     #Get the initialize position of the shot
     def gunpos(self):
