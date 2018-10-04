@@ -7,7 +7,7 @@ import math
 import pygame
 from pygame.locals import *
 
-from Tank import Tank
+from tank import Tank
 from Shot import Shot
 from Score import Score
 from Explosion import Explosion
@@ -26,7 +26,7 @@ MAX_SHOTS      = 2     #most player bullets onscreen
 ALIEN_ODDS     = 22     #chances a new alien appears
 ALIEN_RELOAD   = 12     #frames between new aliens
 SCREENRECT     = config.SCREENRECT
-SCORE          = 0
+#SCORE          = 0
 FPS = config.FPS
 LOCK_TIME = 0.5
 
@@ -100,15 +100,15 @@ def main(winstyle = 0):
     Shot.containersA = shotsA, all
     Shot.containersB = shotsB, all
     Explosion.containers = all
-    Score.containers = all
+    #Score.containers = all
 
     #Create Some Starting Values
-    global score
+    #global score
     kills = 0
     clock = pygame.time.Clock()
 
     #initialize our starting sprites
-    global SCORE
+    #global SCORE
     player = Tank('A')
     player.setActive(True)
     activeAIndex = 0
@@ -125,8 +125,8 @@ def main(winstyle = 0):
     Tank('B')
     Tank('B')
     # Alien() #note, this 'lives' because it goes into a sprite group
-    if pygame.font:
-        all.add(Score())
+    # if pygame.font:
+    #     all.add(Score())
 
 
     activeALock = 0
@@ -224,7 +224,7 @@ def main(winstyle = 0):
             boom_sound.play()
             Explosion(shot)
             Explosion(colA[shot][0])
-            SCORE = SCORE + 1
+            #SCORE = SCORE + 1
             shot.destroy()
 
         colB = pygame.sprite.groupcollide(tanksB, shotsA, True, True)
@@ -232,7 +232,7 @@ def main(winstyle = 0):
             boom_sound.play()
             Explosion(shot)
             Explosion(colB[shot][0])
-            SCORE = SCORE + 1
+            #SCORE = SCORE + 1
             shot.destroy()
 
         #draw the scene
