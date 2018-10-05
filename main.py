@@ -2,64 +2,144 @@ from const import *
 from team import Team
 from flag import Flag
 from basetank import BaseTank
+from util import *
 
 def main():
-	clock = pygame.time.Clock()
+    clock = pygame.time.Clock()
 
-	pygame.init()
+    pygame.init()
 
-	screen = pygame.display.set_mode(WINDOW_SIZE)
+    screen = pygame.display.set_mode(WINDOW_SIZE)
 
-	background = pygame.image.load('./images/background.jpg')
-	background = pygame.transform.scale(background, WINDOW_SIZE)
+    background = pygame.image.load('./images/background.jpg')
+    background = pygame.transform.scale(background, WINDOW_SIZE)
 
-	# init team 
-	posEnemy = [(200, 100),(400, 100), (650, 100), (900,100), (1100,100)]
+    # init team 
+    posEnemy = [(290, 78), (260, 150), (212, 212), (150, 260), (78,  290)]
+    angleEnemy = [75, 60, 45, 30, 15, 0]
 
-	teamEnemyGroup = pygame.sprite.Group()
-	Team(teamEnemyGroup,posEnemy, False)
+    teamEnemyGroup = pygame.sprite.Group()
+    Team(teamEnemyGroup,posEnemy, angleEnemy, False)
 
-	posAlly = [(200, 500), (400, 500), (650, 500), (900, 500), (1100,  500)]
-	teamAllyGroup = pygame.sprite.Group()
-	Team(teamAllyGroup,posAlly,  True)
+    # flag
+    posFlagEnemy = (20, 40)
+    flagEnemy = Flag(posFlagEnemy, True)
 
-	#player 
-	playerTank = BaseTank((650, 300))
-	playerTank.tank1_image()
+    # ally team
+    posAlly = [(WINDOW_WIDTH- 290, WINDOW_HEIGHT- 78), (WINDOW_WIDTH- 260, WINDOW_HEIGHT- 150), (WINDOW_WIDTH- 150,  WINDOW_HEIGHT-260), (WINDOW_WIDTH- 78,  WINDOW_HEIGHT- 290)]
+    angleAlly = [75, 60, 30, 15]
 
-	# flag
-	posFlagEnemy = (650, 20)
-	posFlagAlly = (650, 620)
+    teamAllyGroup = pygame.sprite.Group()
+    Team(teamAllyGroup, posAlly, angleAlly, True)
 
-	flagEnemy = Flag(posFlagEnemy, True)
-	flagAlly = Flag(posFlagAlly, False)
+    # flag
+    posFlagAlly = (WINDOW_WIDTH- 20, WINDOW_HEIGHT-40)
+    flagAlly = Flag(posFlagAlly, False)
 
-	flagGroup = pygame.sprite.Group()
-	flagGroup.add(flagEnemy)
-	flagGroup.add(flagAlly)
 
-	exit = False
-	while not exit:
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				exit = True
-			# if event.type == pygame.KEYDOWN:
-			# 	if event.key == pygame.K_A:
+    #player 
+    playerTank = BaseTank( (WINDOW_WIDTH- 212, WINDOW_HEIGHT- 212), 45, True)
+    teamAllyGroup.add(playerTank)
 
-			# 	else:
+    flagGroup = pygame.sprite.Group()
+    flagGroup.add(flagEnemy)
+    flagGroup.add(flagAlly)
 
-		screen.blit(background, (0,0))
+    bulletGroup = pygame.sprite.Group()
+    bulletEnemyGroup = pygame.sprite.Group()
+    # all tank to 
+    allTankGroup = pygame.sprite.Group()
+    allTankGroup.add(teamAllyGroup.sprites())
+    allTankGroup.add(teamEnemyGroup.sprites())
+    # print(allTankGroup.sprites())
+    exit = False
+    gameover = False
+    while not exit:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.K_ESCAPE:
+                exit = True
 
-		flagGroup.update()
-		flagGroup.draw(screen)
-		teamEnemyGroup.draw(screen)
-		teamAllyGroup.draw(screen)
+        keystate = pygame.key.get_pressed()
+        if gameover == False:
+            #handle player 2 input
+            if(keystate[pygame.K_w]):
+                playerTank.move('head')
+            elif(keystate[pygame.K_s]):
+                playerTank.move('back')
+            elif(keystate[pygame.K_a]):
+                playerTank.move('left')
+            elif(keystate[pygame.K_d]):
+                playerTank.move('right')
+            elif(keystate[pygame.K_SPACE]):
+                newBullet = playerTank.shot()
+                if newBullet:
+                    bulletGroup.add(newBullet)
 
-		screen.blit(playerTank.image, playerTank.pos)
+            screen.blit(background, (0,0))
 
-		pygame.display.flip()
-		clock.tick(FPS)
+            flagGroup.update()
+            flagGroup.draw(screen)
+            teamEnemyGroup.update()
+            teamEnemyGroup.draw(screen)
+            teamAllyGroup.update()
+            teamAllyGroup.draw(screen)
+
+            pygame.draw.circle(screen, BLUE, (int(playerTank.position[0]), int(playerTank.position[1])), 5)
+
+            bulletGroup.update()
+            bulletGroup.draw(screen)
+            # print(bulletGroup.sprites())
+            # print(playerTank.rect)
+            # print(allTankGroup.rect)
+            # factor
+            # if 
+                # pass  
+            for i in allTankGroup.sprites():
+                if i in teamEnemyGroup:
+                    state = i.AI(teamAllyGroup,bulletGroup, flagAlly, flagEnemy, ENEMY_RANDOM_ATTACK)
+                    print("ENEMY: ", state)
+                else:
+                    if i != playerTank:
+                        i.AI(teamEnemyGroup,bulletGroup, flagEnemy,flagAlly, ALLY_RANDOM_ATTACK)
+
+
+
+            for i in allTankGroup.sprites():
+                if(collisionTankWithBullets(i,bulletGroup)):
+                    #animation fire...
+                    i.isShoted(BULLET_DAMAGE)
+
+            for i in flagGroup.sprites():
+                if(collisionTankWithBullets(i, bulletGroup)):
+                    i.isShoted(BULLET_DAMAGE)
+
+            for i in allTankGroup.sprites():
+                tmp = collisionTankWithTank(i, allTankGroup)
+                if (tmp != None):
+                    tmp.isShoted(TANK_RAM)
+                    i.isShoted(TANK_RAM)
+                    #animation
+                    
+
+            for i in flagGroup.sprites():
+                if i.lose:
+                    gameover = True;
+        else:
+            showEndGame(screen, flagEnemy.lose)
+        # screen.blit(playerTank.image, playerTank.position)
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+def showEndGame(screen, enemyLose):
+
+    hintFont = pygame.font.SysFont("helvetica", 30)
+    if enemyLose:
+        score = hintFont.render('Your Win', True, (244, 66, 66))
+    else:
+        score = hintFont.render('Game Over', True, (244, 66, 66))
+    screen.blit(score, (WINDOW_WIDTH/2-50, WINDOW_HEIGHT/2- 10))
 
 if __name__ == '__main__':
-	main()
-	
+    main()
+    

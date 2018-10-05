@@ -5,14 +5,23 @@ class Flag(pygame.sprite.Sprite):
 	size_image = (25, 50)
 	number_image = 7
 	hp = FLAG_HP
+	lose = False
 
-	def __init__(self, pos, isEnemy):
+	def __init__(self, position, isEnemy):
 		super().__init__()
 		self.images = sprite_sheet(self.size_image, './images/flag_200x100.png')
-		self.pos = pos
+		self.position = position
 		self.isEnemy = isEnemy
 		self.index = 0
-		self.rect = (pos, self.size_image)
+		self.rect =  self.images[0].get_rect(center = self.position)
+
+	def isShoted(self, hp):
+		if hp < self.hp:
+			self.hp -= hp
+			# animation for shoted
+		else:
+			# animation for destroyed
+			self.lose = True
 
 	def update(self):
 		self.index += 1
