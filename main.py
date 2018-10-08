@@ -14,27 +14,28 @@ def main():
     background = pygame.image.load('./images/background.jpg')
     background = pygame.transform.scale(background, WINDOW_SIZE)
 
-    # init team 
-    posEnemy = [(290, 78), (260, 150), (212, 212), (150, 260), (78,  290)]
-    angleEnemy = [75, 60, 45, 30, 15, 0]
-
-    teamEnemyGroup = pygame.sprite.Group()
-    Team(teamEnemyGroup,posEnemy, angleEnemy, False)
+    # flag
+    posFlagEnemy = (40, 60)
+    flagEnemy = Flag(posFlagEnemy, True)
 
     # flag
-    posFlagEnemy = (20, 40)
-    flagEnemy = Flag(posFlagEnemy, True)
+    posFlagAlly = (WINDOW_WIDTH- 40, WINDOW_HEIGHT-60)
+    flagAlly = Flag(posFlagAlly, False)
+
+    # init team , (260, 150), (212, 212), (150, 260), (78,  290)
+    posEnemy = [(290, 78), (260, 150), (212, 212), (150, 260), (78,  290)]
+    angleEnemy = [255, 240, 225, 210, 195, 180]
+
+    teamEnemyGroup = pygame.sprite.Group()
+    Team(teamEnemyGroup,posEnemy, angleEnemy, False, flagEnemy, flagAlly, ENEMY_RANDOM_ATTACK)
 
     # ally team
     posAlly = [(WINDOW_WIDTH- 290, WINDOW_HEIGHT- 78), (WINDOW_WIDTH- 260, WINDOW_HEIGHT- 150), (WINDOW_WIDTH- 150,  WINDOW_HEIGHT-260), (WINDOW_WIDTH- 78,  WINDOW_HEIGHT- 290)]
     angleAlly = [75, 60, 30, 15]
 
     teamAllyGroup = pygame.sprite.Group()
-    Team(teamAllyGroup, posAlly, angleAlly, True)
+    Team(teamAllyGroup, posAlly, angleAlly, True, flagAlly, flagEnemy, ALLY_RANDOM_ATTACK)
 
-    # flag
-    posFlagAlly = (WINDOW_WIDTH- 20, WINDOW_HEIGHT-40)
-    flagAlly = Flag(posFlagAlly, False)
 
 
     #player 
@@ -95,14 +96,15 @@ def main():
             # if 
                 # pass  
             for i in allTankGroup.sprites():
-                if i in teamEnemyGroup:
-                    state = i.AI(teamAllyGroup,bulletGroup, flagAlly, flagEnemy, ENEMY_RANDOM_ATTACK)
-                    print("ENEMY: ", state)
-                else:
+                if i in teamAllyGroup:
                     if i != playerTank:
-                        i.AI(teamEnemyGroup,bulletGroup, flagEnemy,flagAlly, ALLY_RANDOM_ATTACK)
+                        i.AI(teamEnemyGroup,bulletGroup, flagEnemy,flagAlly)
+                else:
+                    i.AI(teamAllyGroup,bulletGroup, flagAlly, flagEnemy)
+                    # print("ENEMY: ", state)
 
-
+            # for i in teamAllyGroup:
+            #     print(i.initState)
 
             for i in allTankGroup.sprites():
                 if(collisionTankWithBullets(i,bulletGroup)):
@@ -113,11 +115,13 @@ def main():
                 if(collisionTankWithBullets(i, bulletGroup)):
                     i.isShoted(BULLET_DAMAGE)
 
-            for i in allTankGroup.sprites():
-                tmp = collisionTankWithTank(i, allTankGroup)
-                if (tmp != None):
-                    tmp.isShoted(TANK_RAM)
-                    i.isShoted(TANK_RAM)
+            # for i in allTankGroup.sprites():
+            #     tmp = collisionTankWithTank(i, allTankGroup)
+            #     if (tmp != None):
+            #         tmp.isShoted(TANK_RAM)
+            #         i.isShoted(TANK_RAM)
+            #         print("hp tank orther ",tmp.hp)
+            #         print("hp tank i ",i.hp)
                     #animation
                     
 

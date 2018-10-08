@@ -62,3 +62,7 @@ def collisionTankWithTank(tank, allTanks):
 
 def distance_eulic(pos1, pos2):
     return abs(pos1[0] - pos2[0])**2 + abs(pos1[1] - pos2[1])**2 
+
+
+def angleTwoPoint(a,b): # vector a => b
+    return (pygame.math.Vector2(b.position[0]- a.position[0], b.position[1]- a.position[1]).angle_to((1,0)) +360)%360

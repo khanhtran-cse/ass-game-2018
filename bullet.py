@@ -39,7 +39,6 @@ class Bullet(pygame.sprite.Sprite):
 
 	def update(self):
 		self.updatePos()
-		print(self.angle)
 		if self.checkCollisionWithWall(): 
 			if self.timeCollionWithWall ==0 :
 				self.kill()

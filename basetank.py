@@ -2,7 +2,6 @@
 from const import *
 from util import *
 from bullet import Bullet
-import random
 
 class BaseTank(pygame.sprite.Sprite):
 
@@ -24,8 +23,6 @@ class BaseTank(pygame.sprite.Sprite):
 		else:
 			self.tank2_image()
 		self.hp = TANK_HP
-		
-		self.state = ('Nothing')
 
 		self.timeToReload = pygame.time.get_ticks()
 		self.timeToChangeAI = pygame.time.get_ticks()
@@ -86,61 +83,94 @@ class BaseTank(pygame.sprite.Sprite):
 			# animation for destroyed
 			self.kill()
 
-	def perception(self, teamEnemy, flagEnemy, flagAlly, attack_per):
+	def setState(self, state):
+		self.state = state
+
+	def setInitState(self, state):
+		self.initState = state
+		self.state = state
+
+	def perception(self, teamEnemy, flagEnemy, flagAlly):
 		res = []
-		mi = 100000000
 		for i in teamEnemy:
-			res.append(distance_eulic(self.position, i.position) )
-			if(res[-1] < mi):
-				temp = i
-		res.append(distance_eulic(self.position, flagEnemy.position))
-		if (res[-1]<mi):
-			temp = flagEnemy
-		tmp = min(res)
-		if tmp <= BULLET_MAX_DISTANCE**2:
-			return ('findEnemy', temp)
+			# res.append(distance_eulic(self.position, i.position) )
+			res.append((distance_eulic(self.position, i.position), i))
+		target = min(res, key = lambda t: t[0])
+		# print(target)
+
+		if target[0] <= PERCEPTION_DISTANCE**2:
+			print("*")
+			return ('findEnemy', target[1])
 		elif flagAlly.hp <= FLAG_HP_WARNING:
 			return ('inDefend', flagAlly)
 		elif flagEnemy.hp <= FLAG_HP_WARNING:
 			return('inAttack', flagEnemy)
-		elif random.random() <= attack_per:
-			return('inAttack', flagEnemy)
 		else:
-			return('inDefend', flagEnemy)
+			distanceFlagEnemy = distance_eulic(self.position, flagEnemy.position)
+			distanceFlagAlly = distance_eulic(self.position, flagAlly.position)
+			if distanceFlagEnemy < PERCEPTION_DISTANCE**2:
+				return ('stayAndShot', flagEnemy)
+			elif distanceFlagAlly < PERCEPTION_DISTANCE**2:
+				return ('stay', flagAlly)
+			# stupid WIP: improve
+			return self.initState
 
 
 	def moveAt(self,target):
-		angle = pygame.math.Vector2(target.position[0]- self.position[0], target.position[1]- self.position[1]).angle_to((1,0))
+		angleVector = angleTwoPoint(self, target)
 		# print(abs(angle), self.angle +90)
-		if( abs(abs(angle)-(self.angle+90)) < ANGLE_PERCENT) :
+		angle = abs((angleVector-(self.angle+90) + 360)%360)
+		if( angle < ANGLE_PERCENT) :
 			self.move('head')
 		else:
-			self.move('left')
+			if angle <180:
+				print(angle, angleVector, 'left')
+				self.move('left')
+			else:
+				print(angle, angleVector, 'right')
+				self.move('right')
 		pass
 
-	def AI(self, teamEnemy, bulletGroup, flagEnemy, flagAlly,attack_per):
+	def AI(self, teamEnemy, bulletGroup, flagEnemy, flagAlly):
 		self.tmp = pygame.time.get_ticks()
 		if self.tmp - self.timeToChangeAI  >= TIMER:
-			# print('in')
-			self.timeToReload = self.tmp
-			self.state = self.perception(teamEnemy, flagEnemy, flagAlly,attack_per)
+			self.timeToChangeAI = self.tmp
+			self.state = self.perception(teamEnemy, flagEnemy, flagAlly)
 		if (self.state[0] == 'findEnemy'):
-			# print(self.state[1])
-			angle = pygame.math.Vector2(self.state[1].position[0]- self.position[0], self.state[1].position[1]- self.position[1]).angle_to((1,0))
-			# print(abs(angle), self.angle +90)
-			if( abs(abs(angle)-(self.angle+90)) < ANGLE_PERCENT) and self.canShot  :
-				print('shot')
-				bulletGroup.add(self.shot())
+			angleVector = angleTwoPoint(self, self.state[1])
+			angle = abs((angleVector-(self.angle+90) + 360)%360)
+			# print(angle, self.angle+90, angleVector)
+			if( angle < ANGLE_PERCENT):
+				if self.canShot  :
+					print('shot')
+					bulletGroup.add(self.shot())
+				else:
+					self.move('back')
 			else:
-				self.move('back')
+				if angle <180:
+					self.move('left')
+				else:
+					self.move('right')
 
 		elif (self.state[0] == 'inAttack'):
 			self.moveAt(self.state[1])
 		elif (self.state[0] == 'inDefend'):
 			self.moveAt(self.state[1])
+		elif (self.state[0] == 'stayAndShot'):
+			angleVector = angleTwoPoint(self, self.state[1])
+			angle = abs((angleVector-(self.angle+90) + 360)%360)
+			if( angle < ANGLE_PERCENT) :
+				if self.canShot:
+					print('shot')
+					bulletGroup.add(self.shot())
+			else:
+				if angle <180:
+					self.move('left')
+				else:
+					self.move('right')
 		else:
+			#WIP: need  impove
 			print('stay')
-		return self.state
 
 
 

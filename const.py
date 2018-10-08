@@ -1,5 +1,6 @@
 
 import pygame
+import random
 
 # size of screen
 
@@ -30,13 +31,13 @@ TANK_SPEED = 2 # m/s
 
 TANK_VIEWRANGE = 50 # m
 
-TANK_TIME_RELOAD = 1000 # ms
+TANK_TIME_RELOAD = 5000 # ms
 
 TANK_HP = 1000
 
 TANK_ALPHA_FOR_BULLET_FIRE = 40
 
-TANK_RAM = 10
+TANK_RAM = 100
 
 # bullet
 
@@ -55,11 +56,13 @@ PLAYER_CONTROL_TANK = 3
 
 # stragy
 
+PERCEPTION_DISTANCE = 200
+
 ENEMY_RANDOM_ATTACK = 0.6
 
 
-ALLY_RANDOM_ATTACK = .8
+ALLY_RANDOM_ATTACK = 0.5
 
 ANGLE_PERCENT = 5
 
-TIMER = 5000
+TIMER = 1000
