@@ -193,3 +193,6 @@ class BaseTank(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect(center = self.position)
 		# self.rect = (self.position, (232 - 182,415-345))
 		self.health.update(self,self.hp)
+
+	def setActive(self,active):
+		self.active = active
