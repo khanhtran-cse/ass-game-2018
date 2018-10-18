@@ -5,6 +5,18 @@ from basetank import BaseTank
 from util import *
 from Explosion import Explosion
 from health import Health
+import time
+
+def getSpriteByPosition(position,group):
+    for index,spr in enumerate(group):
+        if (index == position):
+            return spr
+    return False
+
+def deactiveGroup(group):
+    for index,spr in enumerate(group):
+        # spr.setActive(False)
+        print('')
 
 def main():
     clock = pygame.time.Clock()
@@ -69,6 +81,9 @@ def main():
     # print(allTankGroup.sprites())
     exit = False
     gameover = False
+    activeALock = 0
+    activeBLock = 0
+    activeAIndex = 0
     while not exit:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.K_ESCAPE:
@@ -88,6 +103,20 @@ def main():
                 newBullet = playerTank.shot()
                 if newBullet:
                     bulletGroup.add(newBullet)
+
+            currentTime = time.time()
+            if(keystate[K_PERIOD] and currentTime > activeALock):
+                #change active of A
+                activeALock = currentTime + LOCK_TIME
+
+                activeAIndex += 1
+                deactiveGroup(teamAllyGroup)
+                if(activeAIndex >= len(teamAllyGroup)):
+                    activeAIndex = 0
+
+                if(len(teamAllyGroup) > 0):
+                    playerTank = getSpriteByPosition(activeAIndex,teamAllyGroup)
+                    # playerTank.setActive(True)
 
             screen.blit(background, (0,0))
 

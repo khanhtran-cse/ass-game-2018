@@ -15,8 +15,8 @@ FPS = 30 # fps
 
 # flag
 
-FLAG_HP = 5000
-FLAG_HP_WARNING = 7000
+FLAG_HP = 1200
+FLAG_HP_WARNING = 600
 
 # team mate
 
@@ -66,3 +66,6 @@ ALLY_RANDOM_ATTACK = 0.5
 ANGLE_PERCENT = 5
 
 TIMER = 1000
+
+
+LOCK_TIME = 0.5
