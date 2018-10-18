@@ -123,21 +123,6 @@ def main():
                         playerTank = getSpriteByPosition(activeAIndex,teamAllyGroup)
                         playerTank.setActive(True)
 
-                screen.blit(background, (0,0))
-
-                flagGroup.update()
-                flagGroup.draw(screen)
-                teamEnemyGroup.update()
-                teamEnemyGroup.draw(screen)
-                teamAllyGroup.update()
-                teamAllyGroup.draw(screen)
-                explosionGroup.update()
-                explosionGroup.draw(screen)
-
-                pygame.draw.circle(screen, BLUE, (int(playerTank.position[0]), int(playerTank.position[1])), 5)
-
-                bulletGroup.update()
-                bulletGroup.draw(screen)
                 # print(bulletGroup.sprites())
                 # print(playerTank.rect)
                 # print(allTankGroup.rect)
@@ -173,27 +158,48 @@ def main():
                 #         print("hp tank i ",i.hp)
                         #animation
                         
-                if not teamEnemyGroup or not teamAllyGroup:
-                    gameover = True
+                if not teamEnemyGroup:
+                    gameover = 'win'
+                elif not teamAllyGroup:
+                    gameover = 'lose'
 
                 for i in flagGroup.sprites():
                     if i.lose:
-                        gameover = True
+                        if i == flagEnemy:
+                            gameover = 'win'
+                        else:
+                            gameover = 'lose'
+
+                screen.blit(background, (0,0))
+
+                flagGroup.update()
+                flagGroup.draw(screen)
+                teamEnemyGroup.update()
+                teamEnemyGroup.draw(screen)
+                teamAllyGroup.update()
+                teamAllyGroup.draw(screen)
+                explosionGroup.update()
+                explosionGroup.draw(screen)
+
+                pygame.draw.circle(screen, BLUE, (int(playerTank.position[0]), int(playerTank.position[1])), 5)
+
+                bulletGroup.update()
+                bulletGroup.draw(screen)
             else:
-                showEndGame(screen, flagEnemy.lose)
+                showEndGame(screen, gameover)
                 if(keystate[pygame.K_SPACE]):
                     playAgain = True
             # screen.blit(playerTank.image, playerTank.position)
             pygame.display.flip()
             clock.tick(FPS)
 
-def showEndGame(screen, enemyLose):
+def showEndGame(screen, state):
 
     hintFont = pygame.font.SysFont("helvetica", 30)
-    if enemyLose:
+    if state =='win':
         score = hintFont.render('Your Win', True, (244, 66, 66))
-    else:
-        score = hintFont.render('Game Over', True, (244, 66, 66))
+    elif state == 'lose':
+        score = hintFont.render('Your lose', True, (244, 66, 66))
     screen.blit(score, (WINDOW_WIDTH/2-50, WINDOW_HEIGHT/2- 10))
 
 if __name__ == '__main__':
