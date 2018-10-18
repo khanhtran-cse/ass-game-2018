@@ -13,9 +13,9 @@ class Bullet(pygame.sprite.Sprite):
 		"""
 		super().__init__()
 
-		self.image_sprite = pygame.image.load('./images/bullet_x.jpg').convert_alpha()
-		self.original_image = self.image_sprite.subsurface((427,253,468-427,372-253))
-		self.original_image = pygame.transform.scale(self.original_image, (5,20))
+		self.image_sprite = pygame.image.load('./images/bullet_x.png')
+		# self.original_image = self.image_sprite.subsurface((427,253,468-427,372-253))
+		self.original_image = pygame.transform.scale(self.image_sprite, (10,25))
 		self.image = pygame.transform.rotate(self.original_image, angle) 
 		self.original_position = position
 		self.position = position
