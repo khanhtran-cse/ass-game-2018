@@ -3,7 +3,7 @@ import pygame
 class Score:
 	SCORE_COLOR = (29, 155, 1)
 	FAILURE_COLOR = (244, 66, 66)
-	BACKGROUND = pygame.image.load('./images/score-background.png')
+	BACKGROUND = pygame.image.load('./data/score-background.png')
 	score = 0
 	miss = 0
 

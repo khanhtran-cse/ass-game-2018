@@ -13,7 +13,8 @@ class BaseTank(pygame.sprite.Sprite):
 	def __init__(self, position, angle, isAlly):
 		pygame.sprite.Sprite.__init__(self)
 
-		self.image_sprite = pygame.image.load('./images/tank-sprite-png-2.png')
+		self.image_sprite1 = pygame.image.load('./data/tank-move-up1.png')
+		self.image_sprite2 = pygame.image.load('./data/tank-move-up2.png')
 
 		self.position = position
 		self.isAlly = isAlly
@@ -28,12 +29,12 @@ class BaseTank(pygame.sprite.Sprite):
 		self.timeToChangeAI = pygame.time.get_ticks()
 
 	def tank1_image(self):
-		self.original_image = self.image_sprite.subsurface((182,15,232 - 182,88-15))
+		self.original_image = self.image_sprite1.subsurface((0,0,42,100))
 		self.image = pygame.transform.rotate(self.original_image, self.angle)
 		self.rect = self.image.get_rect(center = self.position)
 
 	def tank2_image(self):
-		self.original_image = self.image_sprite.subsurface((182,345,232 - 182,415-345))
+		self.original_image = self.image_sprite2.subsurface((0,0,42,100))
 		self.image = pygame.transform.rotate(self.original_image, self.angle)
 		self.rect = self.image.get_rect(center = self.position)
 
@@ -70,7 +71,11 @@ class BaseTank(pygame.sprite.Sprite):
 	def shot(self):
 		if self.canShot:
 			self.canShot = False
-			return Bullet(self.angle +90, newPosition(self.position, self.angle + 90, TANK_ALPHA_FOR_BULLET_FIRE))
+			if(self.isAlly):
+				type = 1
+			else:
+				type = 2
+			return Bullet(type,self.angle +90, newPosition(self.position, self.angle + 90, TANK_ALPHA_FOR_BULLET_FIRE))
 		else:
 			print("Need time to reload")
 			return None

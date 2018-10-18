@@ -9,7 +9,7 @@ class Flag(pygame.sprite.Sprite):
 
 	def __init__(self, position, isEnemy):
 		super().__init__()
-		self.images = sprite_sheet(self.size_image, './images/flag_200x100.png')
+		self.images = sprite_sheet(self.size_image, './data/flag_200x100.png')
 		self.position = position
 		self.isEnemy = isEnemy
 		self.index = 0

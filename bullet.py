@@ -7,15 +7,20 @@ class Bullet(pygame.sprite.Sprite):
 	speed = BULLET_SPEED
 	timeCollionWithWall = BULLET_TIME_REFLECT_WALL
 
-	def __init__(self, angle, position):
+	def __init__(self,type, angle, position):
 		"""type of buttle like laze, ... 
 			vect: pygame.math.Vector2
 		"""
 		super().__init__()
 
-		self.image_sprite = pygame.image.load('./images/bullet_x.png')
+		self.type = type
+		if(type == 1):
+			self.image_sprite = pygame.image.load('./data/bullet_1_x.png')
+		else:
+			self.image_sprite = pygame.image.load('./data/bullet_2_x.png')
+
 		# self.original_image = self.image_sprite.subsurface((427,253,468-427,372-253))
-		self.original_image = pygame.transform.scale(self.image_sprite, (10,25))
+		self.original_image = pygame.transform.scale(self.image_sprite, (7,18))
 		self.image = pygame.transform.rotate(self.original_image, angle) 
 		self.original_position = position
 		self.position = position
@@ -24,6 +29,8 @@ class Bullet(pygame.sprite.Sprite):
 		self.damage = BULLET_DAMAGE
 
 		self.start_time = pygame.time.get_ticks()
+		
+		#play sound
 
 	def checkCollisionWithWall(self):
 		"""		width

@@ -12,4 +12,4 @@ python main.py
 
 ### AI model will be use in this game
 
-![AI model](./images/AIModel.png)
+![AI model](./data/AIModel.png)

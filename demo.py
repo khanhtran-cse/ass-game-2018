@@ -7,9 +7,9 @@
 
 # screen = pygame.display.set_mode(WINDOW_SIZE)
 
-# background = pygame.image.load('./images/background.jpg')
+# background = pygame.image.load('./data/background.jpg')
 # background = pygame.transform.scale(background, WINDOW_SIZE)
-# sprite_flag = sprite_sheet((25,50), './images/flag_200x100.png')
+# sprite_flag = sprite_sheet((25,50), './data/flag_200x100.png')
 
 # clock = pygame.time.Clock()
 # exit = False

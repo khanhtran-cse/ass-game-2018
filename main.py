@@ -11,7 +11,7 @@ def main():
 
     screen = pygame.display.set_mode(WINDOW_SIZE)
 
-    background = pygame.image.load('./images/background.png')
+    background = pygame.image.load('./data/background.png')
     background = pygame.transform.scale(background, WINDOW_SIZE)
 
     # flag
