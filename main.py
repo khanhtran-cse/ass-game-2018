@@ -89,7 +89,7 @@ def main():
         
         playAgain=False
 
-        while not playAgain:
+        while not (playAgain or exit):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or event.type == pygame.K_ESCAPE:
                     exit = True
@@ -192,6 +192,7 @@ def main():
             # screen.blit(playerTank.image, playerTank.position)
             pygame.display.flip()
             clock.tick(FPS)
+        print(exit)
 
 def showEndGame(screen, state):
 

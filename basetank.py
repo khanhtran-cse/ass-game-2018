@@ -15,8 +15,8 @@ class BaseTank(pygame.sprite.Sprite):
 	def __init__(self, position, angle, isAlly):
 		pygame.sprite.Sprite.__init__(self)
 
-		self.image_sprite1 = pygame.image.load('./data/tank-move-up1.png')
-		self.image_sprite2 = pygame.image.load('./data/tank-move-up2.png')
+		self.image_sprite1 = pygame.image.load('./data/tank-move-up3.png')
+		self.image_sprite2 = pygame.image.load('./data/tank-move-up4.png')
 
 		self.position = position
 		self.isAlly = isAlly
@@ -33,12 +33,12 @@ class BaseTank(pygame.sprite.Sprite):
 		self.timeToChangeAI = pygame.time.get_ticks()
 
 	def tank1_image(self):
-		self.original_image = self.image_sprite1.subsurface((0,0,42,100))
+		self.original_image = self.image_sprite1# self.image_sprite1.subsurface((0,0,42,100))
 		self.image = pygame.transform.rotate(self.original_image, self.angle)
 		self.rect = self.image.get_rect(center = self.position)
 
 	def tank2_image(self):
-		self.original_image = self.image_sprite2.subsurface((0,0,42,100))
+		self.original_image = self.image_sprite2# self.image_sprite2.subsurface((0,0,42,100))
 		self.image = pygame.transform.rotate(self.original_image, self.angle)
 		self.rect = self.image.get_rect(center = self.position)
 
