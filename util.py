@@ -1,6 +1,11 @@
-import pygame
+import pygame,os.path
 import math
 
+#import basic pygame modules
+import pygame
+from pygame.locals import *
+
+main_dir = os.path.split(os.path.abspath(__file__))[0]
 
 def sprite_sheet(size,file,pos=(0,0)):
 
@@ -66,3 +71,16 @@ def distance_eulic(pos1, pos2):
 
 def angleTwoPoint(a,b): # vector a => b
     return (pygame.math.Vector2(b.position[0]- a.position[0], b.position[1]- a.position[1]).angle_to((1,0)) +360)%360
+
+class dummysound:
+    def play(self): pass
+
+def load_sound(file):
+    if not pygame.mixer: return dummysound()
+    file = os.path.join(main_dir, 'data', file)
+    try:
+        sound = pygame.mixer.Sound(file)
+        return sound
+    except pygame.error:
+        print ('Warning, unable to load, %s' % file)
+    return dummysound()

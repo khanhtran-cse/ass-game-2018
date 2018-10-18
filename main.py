@@ -14,6 +14,12 @@ def main():
     background = pygame.image.load('./data/background.png')
     background = pygame.transform.scale(background, WINDOW_SIZE)
 
+    #sound
+    if pygame.mixer:
+        # music = os.path.join(Util.main_dir, 'data', 'house_lo.wav')
+        pygame.mixer.music.load('./data/house_lo.wav')
+        pygame.mixer.music.play(-1)
+
     # flag
     posFlagEnemy = (40, 60)
     flagEnemy = Flag(posFlagEnemy, True)

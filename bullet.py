@@ -1,5 +1,6 @@
 from const import *
 from util import *
+import pygame
 
 class Bullet(pygame.sprite.Sprite):
 
@@ -29,8 +30,11 @@ class Bullet(pygame.sprite.Sprite):
 		self.damage = BULLET_DAMAGE
 
 		self.start_time = pygame.time.get_ticks()
-		
+
+
+		self.shoot_sound = load_sound('car_door.wav')
 		#play sound
+		self.shoot_sound.play()
 
 	def checkCollisionWithWall(self):
 		"""		width
