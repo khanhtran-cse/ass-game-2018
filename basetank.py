@@ -2,6 +2,8 @@
 from const import *
 from util import *
 from bullet import Bullet
+from Explosion import Explosion
+from health import Health
 
 class BaseTank(pygame.sprite.Sprite):
 
@@ -21,8 +23,10 @@ class BaseTank(pygame.sprite.Sprite):
 		self.angle = angle
 		if isAlly == True:
 			self.tank1_image()
+			self.health = Health(TANK_HP,1)
 		else:
 			self.tank2_image()
+			self.health = Health(TANK_HP,2)
 		self.hp = TANK_HP
 
 		self.timeToReload = pygame.time.get_ticks()
@@ -86,6 +90,7 @@ class BaseTank(pygame.sprite.Sprite):
 			# animation for shoted
 		else:
 			# animation for destroyed
+			Explosion(self)
 			self.kill()
 
 	def setState(self, state):
@@ -129,10 +134,10 @@ class BaseTank(pygame.sprite.Sprite):
 			self.move('head')
 		else:
 			if angle <180:
-				print(angle, angleVector, 'left')
+				# print(angle, angleVector, 'left')
 				self.move('left')
 			else:
-				print(angle, angleVector, 'right')
+				# print(angle, angleVector, 'right')
 				self.move('right')
 		pass
 
@@ -173,11 +178,11 @@ class BaseTank(pygame.sprite.Sprite):
 					self.move('left')
 				else:
 					self.move('right')
-		else:
 			#WIP: need  impove
-			print('stay')
+			# print('stay')
 
-
+	def getRect(self):
+		return self.rect
 
 	def update(self):
 		self.tmp = pygame.time.get_ticks()
@@ -187,3 +192,4 @@ class BaseTank(pygame.sprite.Sprite):
 		self.image = pygame.transform.rotate(self.original_image, self.angle)
 		self.rect = self.image.get_rect(center = self.position)
 		# self.rect = (self.position, (232 - 182,415-345))
+		self.health.update(self,self.hp)

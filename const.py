@@ -16,7 +16,7 @@ FPS = 30 # fps
 # flag
 
 FLAG_HP = 5000
-FLAG_HP_WARNING = 1500
+FLAG_HP_WARNING = 7000
 
 # team mate
 

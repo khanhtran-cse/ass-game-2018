@@ -47,6 +47,7 @@ def collisionTankWithBullets(tank, bullets):
     x,y,w,h = tank.rect
     nWidth = 30
     rect = pygame.Rect(x + w/2-nWidth/2, y +  h/2-nWidth/2, nWidth, nWidth )
+    # rect= tank.getRect()
     for i in bullets:
         if i.rect.colliderect(rect):
             i.kill()

@@ -16,9 +16,9 @@ class Bullet(pygame.sprite.Sprite):
 
 		self.type = type
 		if(type == 1):
-			self.image_sprite = pygame.image.load('./data/bullet_1_x.png')
-		else:
 			self.image_sprite = pygame.image.load('./data/bullet_2_x.png')
+		else:
+			self.image_sprite = pygame.image.load('./data/bullet_1_x.png')
 
 		# self.original_image = self.image_sprite.subsurface((427,253,468-427,372-253))
 		self.original_image = pygame.transform.scale(self.image_sprite, (7,18))

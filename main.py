@@ -3,6 +3,8 @@ from team import Team
 from flag import Flag
 from basetank import BaseTank
 from util import *
+from Explosion import Explosion
+from health import Health
 
 def main():
     clock = pygame.time.Clock()
@@ -42,7 +44,13 @@ def main():
     teamAllyGroup = pygame.sprite.Group()
     Team(teamAllyGroup, posAlly, angleAlly, True, flagAlly, flagEnemy, ALLY_RANDOM_ATTACK)
 
+    #load explosion image
+    img = pygame.image.load('./data/explosion1.gif')
+    Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
+    explosionGroup = pygame.sprite.Group()
+    Explosion.containers = explosionGroup
 
+    Health.screen = screen
 
     #player 
     playerTank = BaseTank( (WINDOW_WIDTH- 212, WINDOW_HEIGHT- 212), 45, True)
@@ -65,19 +73,18 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.K_ESCAPE:
                 exit = True
-
         keystate = pygame.key.get_pressed()
         if gameover == False:
             #handle player 2 input
             if(keystate[pygame.K_w]):
                 playerTank.move('head')
-            elif(keystate[pygame.K_s]):
+            if(keystate[pygame.K_s]):
                 playerTank.move('back')
-            elif(keystate[pygame.K_a]):
+            if(keystate[pygame.K_a]):
                 playerTank.move('left')
-            elif(keystate[pygame.K_d]):
+            if(keystate[pygame.K_d]):
                 playerTank.move('right')
-            elif(keystate[pygame.K_SPACE]):
+            if(keystate[pygame.K_SPACE]):
                 newBullet = playerTank.shot()
                 if newBullet:
                     bulletGroup.add(newBullet)
@@ -90,6 +97,8 @@ def main():
             teamEnemyGroup.draw(screen)
             teamAllyGroup.update()
             teamAllyGroup.draw(screen)
+            explosionGroup.update()
+            explosionGroup.draw(screen)
 
             pygame.draw.circle(screen, BLUE, (int(playerTank.position[0]), int(playerTank.position[1])), 5)
 

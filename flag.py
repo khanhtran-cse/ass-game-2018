@@ -1,5 +1,6 @@
 from const import *
 from util import *
+from health import Health
 
 class Flag(pygame.sprite.Sprite):
 	size_image = (25, 50)
@@ -14,6 +15,10 @@ class Flag(pygame.sprite.Sprite):
 		self.isEnemy = isEnemy
 		self.index = 0
 		self.rect =  self.images[0].get_rect(center = self.position)
+		if(isEnemy):
+			self.health = Health(FLAG_HP,2)
+		else:
+			self.health = Health(FLAG_HP,1)
 
 	def isShoted(self, hp):
 		if hp < self.hp:
@@ -29,3 +34,4 @@ class Flag(pygame.sprite.Sprite):
 			self.index = 0
 		# print(self.index)
 		self.image = self.images[self.isEnemy*7 + self.index]
+		self.health.update(self,self.hp)
