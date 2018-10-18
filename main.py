@@ -173,6 +173,8 @@ def main():
                 #         print("hp tank i ",i.hp)
                         #animation
                         
+                if not teamEnemyGroup or not teamAllyGroup:
+                    gameover = True
 
                 for i in flagGroup.sprites():
                     if i.lose:
