@@ -47,7 +47,7 @@ class Bullet(pygame.sprite.Sprite):
 			self.timeCollionWithWall-=1
 		# else self.checkCollisionWithTarget():
 		# 	pass
-		self.image = pygame.transform.rotate(self.original_image, self.angle)
+		self.image = pygame.transform.rotate(self.original_image, self.angle - 90)
 		self.rect = self.image.get_rect(center= self.position)
 
 	def updatePos(self):
