@@ -3,7 +3,7 @@ from util import *
 
 class Health(pygame.sprite.Sprite):
     image =pygame.image.load('./data/health.png')
-    width = 60
+    width = 50
     def __init__(self, max,type):
         self.max = max
         self.type = type

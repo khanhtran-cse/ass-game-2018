@@ -110,18 +110,26 @@ class BaseTank(pygame.sprite.Sprite):
 
 		if target[0] <= PERCEPTION_DISTANCE**2:
 			print("*")
-			return ('findEnemy', target[1])
+			return ('findEnemy', target[1])			
 		elif flagAlly.hp <= FLAG_HP_WARNING:
+			distanceFlagAlly = distance_eulic(self.position, flagAlly.position)
+			if distanceFlagAlly < PERCEPTION_DISTANCE*30:
+				return ('patrol', flagAlly)
 			return ('inDefend', flagAlly)
 		elif flagEnemy.hp <= FLAG_HP_WARNING:
-			return('inAttack', flagEnemy)
-		else:
 			distanceFlagEnemy = distance_eulic(self.position, flagEnemy.position)
-			distanceFlagAlly = distance_eulic(self.position, flagAlly.position)
 			if distanceFlagEnemy < PERCEPTION_DISTANCE**2:
 				return ('stayAndShot', flagEnemy)
-			elif distanceFlagAlly < PERCEPTION_DISTANCE**2:
-				return ('stay', flagAlly)
+			return('inAttack', flagEnemy)
+		else:
+			distanceFlagAlly = distance_eulic(self.position, flagAlly.position)
+			# print(distanceFlagAlly, PERCEPTION_DISTANCE*30)
+			if distanceFlagAlly < PERCEPTION_DISTANCE*30:
+				return ('patrol', flagAlly)
+
+			distanceFlagEnemy = distance_eulic(self.position, flagEnemy.position)
+			if distanceFlagEnemy < PERCEPTION_DISTANCE**2:
+				return ('stayAndShot', flagEnemy)
 			# stupid WIP: improve
 			return self.initState
 
@@ -146,6 +154,7 @@ class BaseTank(pygame.sprite.Sprite):
 		if self.tmp - self.timeToChangeAI  >= TIMER:
 			self.timeToChangeAI = self.tmp
 			self.state = self.perception(teamEnemy, flagEnemy, flagAlly)
+			print(self.state)
 		if (self.state[0] == 'findEnemy'):
 			angleVector = angleTwoPoint(self, self.state[1])
 			angle = abs((angleVector-(self.angle+90) + 360)%360)
@@ -178,6 +187,8 @@ class BaseTank(pygame.sprite.Sprite):
 					self.move('left')
 				else:
 					self.move('right')
+		elif self.state[0] == 'patrol':
+			pass
 			#WIP: need  impove
 			# print('stay')
 
@@ -194,5 +205,5 @@ class BaseTank(pygame.sprite.Sprite):
 		# self.rect = (self.position, (232 - 182,415-345))
 		self.health.update(self,self.hp)
 
-	def setActive(self,active):
-		self.active = active
+	# def setActive(self,active):
+	# 	self.active = active
