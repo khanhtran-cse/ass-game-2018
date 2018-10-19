@@ -87,7 +87,9 @@ def main():
         # activeAIndex = 0
         
         playAgain=False
-        countDown = 6000 # ms
+        countDown = TIME_TO_READY # ms
+
+        timeToActiveTank = 0
 
         while not (playAgain or exit):
             for event in pygame.event.get():
@@ -114,48 +116,47 @@ def main():
                         newBullet = i.shot()
                         if newBullet:
                             bulletGroup.add(newBullet)
-
-                if(keystate[pygame.K_1]):
-                    allySprites = teamAllyGroup.sprites()
-                    if allySprites[0] in playerControlGroup:
-                        playerControlGroup.remove(allySprites[0])
-                        print('remove')
-                    else:
-                        playerControlGroup.add(allySprites[0])
-                        print('add')
-                elif(keystate[pygame.K_2] and len(teamAllyGroup)> 1):
-                    allySprites = teamAllyGroup.sprites()
-                    if allySprites[1] in playerControlGroup:
-                        playerControlGroup.remove(allySprites[1])
-                    else:
-                        playerControlGroup.add(allySprites[1])
-                elif(keystate[pygame.K_3] and len(teamAllyGroup)> 2):
-                    allySprites = teamAllyGroup.sprites()
-                    if allySprites[2] in playerControlGroup:
-                        playerControlGroup.remove(allySprites[2])
-                    else:
-                        playerControlGroup.add(allySprites[2])
-                elif(keystate[pygame.K_4] and len(teamAllyGroup)> 3):
-                    allySprites = teamAllyGroup.sprites()
-                    if allySprites[3] in playerControlGroup:
-                        playerControlGroup.remove(allySprites[3])
-                    else:
-                        playerControlGroup.add(allySprites[3])
-                elif(keystate[pygame.K_5] and len(teamAllyGroup)> 4):
-                    allySprites = teamAllyGroup.sprites()
-                    if allySprites[4] in playerControlGroup:
-                        playerControlGroup.remove(allySprites[4])
-                    else:
-                        playerControlGroup.add(allySprites[4])
+                if (keystate[pygame.K_1] or keystate[pygame.K_2] or keystate[pygame.K_3] or keystate[pygame.K_4] or keystate[pygame.K_5]) and pygame.time.get_ticks() - timeToActiveTank > TIME_TO_ACTIVE_TANK:
+                    timeToActiveTank = pygame.time.get_ticks()
+                    if(keystate[pygame.K_1]):
+                        allySprites = teamAllyGroup.sprites()
+                        if allySprites[0] in playerControlGroup:
+                            playerControlGroup.remove(allySprites[0])
+                        else:
+                            playerControlGroup.add(allySprites[0])
+                    elif(keystate[pygame.K_2] and len(teamAllyGroup)> 1):
+                        allySprites = teamAllyGroup.sprites()
+                        if allySprites[1] in playerControlGroup:
+                            playerControlGroup.remove(allySprites[1])
+                        else:
+                            playerControlGroup.add(allySprites[1])
+                    elif(keystate[pygame.K_3] and len(teamAllyGroup)> 2):
+                        allySprites = teamAllyGroup.sprites()
+                        if allySprites[2] in playerControlGroup:
+                            playerControlGroup.remove(allySprites[2])
+                        else:
+                            playerControlGroup.add(allySprites[2])
+                    elif(keystate[pygame.K_4] and len(teamAllyGroup)> 3):
+                        allySprites = teamAllyGroup.sprites()
+                        if allySprites[3] in playerControlGroup:
+                            playerControlGroup.remove(allySprites[3])
+                        else:
+                            playerControlGroup.add(allySprites[3])
+                    elif(keystate[pygame.K_5] and len(teamAllyGroup)> 4):
+                        allySprites = teamAllyGroup.sprites()
+                        if allySprites[4] in playerControlGroup:
+                            playerControlGroup.remove(allySprites[4])
+                        else:
+                            playerControlGroup.add(allySprites[4])
                 screen.blit(background, (0,0))
-
+                print(countDown)
                 # count 5->0 to begin playe
                 if countDown >= 0:
                     hintFont = pygame.font.SysFont("helvetica", 50)
 
                     score = hintFont.render(str(countDown//1000), True, (244, 66, 66))
                     screen.blit(score, (WINDOW_WIDTH/2-50, WINDOW_HEIGHT/2- 10))
-                    countDown = 6000 - pygame.time.get_ticks()
+                    countDown = TIME_TO_READY - pygame.time.get_ticks()
                 else:
 
                     # currentTime = time.time()
